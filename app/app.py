@@ -6,6 +6,7 @@ import db
 import config
 import json
 import os
+import commands
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -62,9 +63,13 @@ def logout():
     del session["username"]
     return redirect("/")
 
-@app.route("/catalogue")
+@app.route("/catalogue", methods = ["GET", "POST"])
 def catalogue():
-    return render_template("catalogue.html", message = "")
+    if request.method == "GET":
+        allPlants = commands.get_plants()
+        return render_template("catalogue.html", message = "", plants=allPlants)
+    if request.method == "POST":
+        pass
 
 @app.route("/import", methods = ["GET", "POST"])
 def importPlants():
@@ -75,6 +80,19 @@ def importPlants():
         if file and file.filename.endswith(".json"):
             try:
                 data = json.load(file)
+                for plant in data:
+                    plantInsert = "INSERT INTO plants (name, rarity, Area, Region, Effects, description) VALUES (?, ?, ?, ?, ?, ?)"
+                    Areas = "" 
+                    Regions = "" 
+                    Effects = ""
+                    for i in plant["Area"]:
+                        Areas += i + ", "
+                    for i in plant["Region"]:
+                        Regions += i + ", "
+                    for i in plant["Effects"]:
+                        Effects += i + ", "
+                    Areas, Regions, Effects = Areas[:-2], Regions[:-2], Effects[:-2]
+                    db.execute(plantInsert, (plant["name"], plant["rarity"], Areas, Regions, Effects, plant["Description"]))
                 return render_template("import.html", message = "JSON file read successfully!")
             except json.JSONDecodeError:
                 return render_template("import.html", message = "Unable to read JSON file, invalid formatting")

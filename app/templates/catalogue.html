@@ -7,8 +7,14 @@
     <body>
         {% for plant in plants %}
         <p>
-            <a href="/thread/{{ thread.id }}">{{ plant.name }}</a>
+            <a href="/plants/{{ plant.name }}">{{ plant.name }}</a>
+            <form action="/edit/{{ plant.name }}" method="POST">
+                <button type="submit">Edit</button>
+            </form>
+            <form action="/delete/{{ plant.name }}" method="POST">
+                <button type="submit">Delete</button>
+            </form>
         </p>
         {% endfor %}
-</body>
+    </body>
 </html>
