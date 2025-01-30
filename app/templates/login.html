@@ -6,12 +6,30 @@
 </head>
 
 <body>
-    <form action="/login">
-        <button type="submit">Login</button>
-    </form>
-    <form action="/register">
-        <button type="submit">Register</button>
-    </form>
-  </body>
+  {% if session.username %}
+  <p>
+    Olet kirjautunut nimellä {{ session.username }}
+  </p>
+  <p>
+    <a href="/logout">Kirjaudu ulos</a>
+  </p>
+  {% else %}
+  <form action="/login" method="post">
+    <p>
+      Username: <br />
+      <input type="text" name="username" />
+    </p>
+    <p>
+      Password: <br />
+      <input type="password" name="password" />
+    </p>
+    <input type="submit" value="Login" />
+    <p>
+      <a href="/register">Register</a>
+    </p>
+    <h1>{{ message }}</h1>
+  </form>
+  {% endif %}
+</body>
 
 </html>
