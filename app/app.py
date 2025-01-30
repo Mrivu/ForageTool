@@ -4,13 +4,19 @@ from flask import redirect, render_template, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 import config
+import json
+import os
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
-@app.route("/")
+@app.route("/", methods = ["GET", "PUSH"])
 def user():
-    return render_template("login.html")
+    if request.method == "GET":
+        return render_template("main.html")
+    if request.method == "POST":
+        pass
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -55,3 +61,23 @@ def register():
 def logout():
     del session["username"]
     return redirect("/")
+
+@app.route("/catalogue")
+def catalogue():
+    return render_template("catalogue.html", message = "")
+
+@app.route("/import", methods = ["GET", "POST"])
+def importPlants():
+    if request.method == "GET":
+        return render_template("import.html")
+    if request.method == "POST":
+        file = request.files["plants"]
+        if file and file.filename.endswith(".json"):
+            try:
+                data = json.load(file)
+                return render_template("import.html", message = "JSON file read successfully!")
+            except json.JSONDecodeError:
+                return render_template("import.html", message = "Unable to read JSON file, invalid formatting")
+
+
+    return render_template("import.html", message = "Invalid file type. Please upload a JSON file.")

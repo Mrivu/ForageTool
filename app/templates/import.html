@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Import plants</title>
+    </head>
+
+    <body>
+        <h1>Import plants</h1>
+        <h2>Load plant JSON file</h2>
+        <form action="/import" method="POST" enctype="multipart/form-data">
+            <input type="file" name="plants" accept=".json" required>
+            <button type="submit">Upload</button>
+        </form>
+        <h2>{{ message }}</h2>
+    </body>
+</html>

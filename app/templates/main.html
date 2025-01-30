@@ -2,14 +2,18 @@
 <html>
 
 <head>
-  <title>Etusivu</title>
+  <title>Main page</title>
 </head>
 
 <body>
   {% if session.username %}
-  <p>
-    Olet kirjautunut nimellä {{ session.username }}
-  </p>
+  <h1>Logged in as {{ session.username }}</h1>
+  <form action="/catalogue">
+    <button type="submit">See plant catalogue</button>
+  </form>
+  <form action="/import">
+      <button type="submit">Import Plants (Admin)</button>
+  </form>
   <p>
     <a href="/logout">Kirjaudu ulos</a>
   </p>

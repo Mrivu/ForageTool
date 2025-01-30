@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Plant Catalogue</title>
+    </head>
+
+    <body>
+        {% for plant in plants %}
+        <p>
+            <a href="/thread/{{ thread.id }}">{{ plant.name }}</a>
+        </p>
+        {% endfor %}
+</body>
+</html>
