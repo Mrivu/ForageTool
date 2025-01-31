@@ -8,10 +8,10 @@
         {% for plant in plants %}
         <p>
             <a href="/plants/{{ plant.name }}">{{ plant.name }}</a>
-            <form action="/edit/{{ plant.name }}" method="POST">
+            <form action="edit/{{ plant.name }}">
                 <button type="submit">Edit</button>
             </form>
-            <form action="/delete/{{ plant.name }}" method="POST">
+            <form action="delete/{{ plant.name }}">
                 <button type="submit">Delete</button>
             </form>
         </p>

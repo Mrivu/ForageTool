@@ -18,7 +18,7 @@
     <a href="/logout">Kirjaudu ulos</a>
   </p>
   {% else %}
-  <form action="/main" method="post">
+  <form action="/" method="POST">
     <p>
       Username: <br />
       <input type="text" name="username" />
@@ -27,12 +27,12 @@
       Password: <br />
       <input type="password" name="password" />
     </p>
-    <input type="submit" value="Login" />
-    <p>
-      <a href="/register">Register</a>
-    </p>
-    <h1>{{ message }}</h1>
+    <input type="submit"/>
   </form>
+  <p>
+    <a href="/register">Register</a>
+  </p>
+  <h1>{{ message }}</h1>
   {% endif %}
 </body>
 

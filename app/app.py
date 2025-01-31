@@ -11,18 +11,10 @@ import commands
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
-@app.route("/", methods = ["GET", "PUSH"])
+@app.route("/", methods = ["GET", "POST"])
 def user():
     if request.method == "GET":
-        return render_template("main.html")
-    if request.method == "POST":
-        pass
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "GET":
-        return render_template("login.html", message="")
+        return render_template("main.html", message="")
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -35,7 +27,7 @@ def login():
             if check_password_hash(password_hash, password):
                 session["username"] = username
                 return redirect("/")
-        return render_template("login.html", message="VIRHE: väärä tunnus tai salasana")
+        return render_template("main.html", message="VIRHE: väärä tunnus tai salasana")
 
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -104,3 +96,20 @@ def importPlants():
 def viewPlant(name):
     plant = commands.get_plant(name)
     return render_template("plant.html", plant=plant)
+
+@app.route("/edit/<string:name>", methods = ["GET", "POST"])
+def editPlant(name):
+    pass
+
+@app.route("/delete/<string:name>", methods = ["GET", "POST"])
+def deletePlant(name):
+    if request.method == "GET":
+        plant = commands.get_plant(name)
+        return render_template("delete.html", plant=plant)
+    if request.method == "POST":
+        action = request.form.get("button")
+        if action == "yes":
+            db.execute("DELETE FROM plants WHERE name = ?", (name,))
+            return redirect("/catalogue")
+        elif action == "no":
+            return redirect("/catalogue")
