@@ -8,8 +8,6 @@
         <h1>Are you sure you want to delete {{ plant.Name }} from the Catalogue?</h1>
         <form action="/delete/{{ plant.name }}" method="POST">
             <button type="submit" name="button" value="yes">YES</button>
-        </form>
-        <form action="/delete/{{ plant.name }}" method="POST">
             <button type="submit" name="button" value="no">NO</button>
         </form>
         <a href="/catalogue">Go back</a>

@@ -99,7 +99,31 @@ def viewPlant(name):
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
 def editPlant(name):
-    pass
+    if request.method == "GET":
+        plant = commands.get_plant(name)
+        return render_template("edit.html", plant=plant, message="")
+    if request.method == "POST":
+        plant = commands.get_plant(name)
+        
+        Name = request.form.get("Name")
+        Rarity = request.form.get("Rarity")
+        Area = request.form.get("Area")
+        Region = request.form.get("Region")
+        Effects = request.form.get("Effects")
+        Description = request.form.get("Description")
+
+        fields = [Name, Rarity, Area, Region, Effects, Description]
+        for field in fields:
+            print(field)
+            if field == "":
+                return render_template("edit.html", plant=plant, message=f"{field} is empty")
+        sql = """
+        UPDATE plants
+        SET Name = ?, Rarity = ?, Area = ?, Region = ?, Effects = ?, Description = ?
+        WHERE Name = ?
+        """
+        db.execute(sql, [fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], plant["Name"]])
+        return redirect("/catalogue")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
 def deletePlant(name):
