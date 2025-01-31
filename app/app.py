@@ -69,6 +69,7 @@ def importPlants():
         return render_template("import.html")
     if request.method == "POST":
         file = request.files["plants"]
+        overwrite = request.form.get("overwrite", "no")
         if file and file.filename.endswith(".json"):
             try:
                 data = json.load(file)
@@ -84,7 +85,16 @@ def importPlants():
                     for i in plant["Effects"]:
                         Effects += i + ", "
                     Areas, Regions, Effects = Areas[:-2], Regions[:-2], Effects[:-2]
-                    db.execute(plantInsert, (plant["name"], plant["rarity"], Areas, Regions, Effects, plant["Description"]))
+                    existingPlant = commands.get_plant(plant["name"])
+                    if existingPlant and overwrite == "yes":
+                        plantUpdate = """
+                        UPDATE plants
+                        SET Rarity = ?, Area = ?, Region = ?, Effects = ?, Description = ?
+                        WHERE Name = ?
+                        """
+                        db.execute(plantUpdate, [plant["rarity"], Areas, Regions, Effects, plant["Description"], plant["name"]])
+                    elif not existingPlant:
+                        db.execute(plantInsert, (plant["name"], plant["rarity"], Areas, Regions, Effects, plant["Description"]))
                 return render_template("import.html", message = "JSON file read successfully!")
             except json.JSONDecodeError:
                 return render_template("import.html", message = "Unable to read JSON file, invalid formatting")
@@ -114,9 +124,8 @@ def editPlant(name):
 
         fields = [Name, Rarity, Area, Region, Effects, Description]
         for field in fields:
-            print(field)
             if field == "":
-                return render_template("edit.html", plant=plant, message=f"{field} is empty")
+                return render_template("edit.html", plant=plant, message="A field cannot be empty")
         sql = """
         UPDATE plants
         SET Name = ?, Rarity = ?, Area = ?, Region = ?, Effects = ?, Description = ?

@@ -6,4 +6,7 @@ def get_plants():
 
 def get_plant(name):
     sql = "SELECT * FROM plants WHERE Name = ?"
-    return db.query(sql, [name])[0]
+    result = db.query(sql, [name])
+    if result:
+        return result[0]
+    return None
