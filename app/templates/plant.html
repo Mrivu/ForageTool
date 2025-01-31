@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>{{ plant.Name }}</title>
+    </head>
+
+    <body>
+        {% if plant %}
+        <h1>{{ plant.Name }}</h1>
+        <h2>{{ plant.Rarity }} plant</h2>
+        <h2>Found in {{ plant.Area }} in {{ plant.Region }}</h2>
+        <h2>Effects: {{ plant.Effects }}</h2>
+        <h2>"{{ plant.Description }}"</h2>
+        {% else %}
+        <p>Plant not found.</p>
+        {% endif %}
+        <a href="/">Go back</a>
+    </body>
+</html>

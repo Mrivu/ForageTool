@@ -99,3 +99,8 @@ def importPlants():
 
 
     return render_template("import.html", message = "Invalid file type. Please upload a JSON file.")
+
+@app.route("/plants/<string:name>")
+def viewPlant(name):
+    plant = commands.get_plant(name)
+    return render_template("plant.html", plant=plant)
