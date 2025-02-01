@@ -14,6 +14,8 @@ app.secret_key = config.secret_key
 @app.route("/", methods = ["GET", "POST"])
 def user():
     if request.method == "GET":
+        session["keyword"] = ""
+        session["selected_filter"] = "Name"
         return render_template("main.html", message="")
     if request.method == "POST":
         username = request.form["username"]
@@ -58,13 +60,18 @@ def logout():
 @app.route("/catalogue", methods = ["GET", "POST"])
 def catalogue():
     if request.method == "GET":
-        allPlants = commands.get_plants()
-        return render_template("catalogue.html", message = "", plants=allPlants)
+        Plants = commands.get_plants_by(session["keyword"], session["selected_filter"])
+        return render_template("catalogue.html", message = "", plants=Plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
     if request.method == "POST":
-        pass
+        selected_filter = request.form["filter"]
+        keyword = request.form["keyword"]
+        Plants = commands.get_plants_by(keyword, selected_filter)
+        session["keyword"] = keyword
+        session["selected_filter"] = selected_filter
+        return render_template("catalogue.html", message = "", plants=Plants, keyword=keyword, selected_filter=session["selected_filter"])
 
 @app.route("/import", methods = ["GET", "POST"])
-def importPlants():
+def import_plants():
     if request.method == "GET":
         return render_template("import.html")
     if request.method == "POST":
@@ -103,12 +110,12 @@ def importPlants():
     return render_template("import.html", message = "Invalid file type. Please upload a JSON file.")
 
 @app.route("/plants/<string:name>")
-def viewPlant(name):
+def view_plant(name):
     plant = commands.get_plant(name)
     return render_template("plant.html", plant=plant)
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
-def editPlant(name):
+def edit_plant(name):
     if request.method == "GET":
         plant = commands.get_plant(name)
         return render_template("edit.html", plant=plant, message="")
@@ -135,7 +142,7 @@ def editPlant(name):
         return redirect("/catalogue")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
-def deletePlant(name):
+def delete_plant(name):
     if request.method == "GET":
         plant = commands.get_plant(name)
         return render_template("delete.html", plant=plant)

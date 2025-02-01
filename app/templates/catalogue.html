@@ -5,6 +5,24 @@
     </head>
 
     <body>
+        <form action="/catalogue" method = "POST">
+            <label for="filters">Sort by:</label>
+            <select name="filter" id="filters">
+                <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
+                <option value="Rarity" {% if selected_filter == "Rarity" %}selected{% endif %}>Rarity</option>
+                <option value="Area" {% if selected_filter == "Area" %}selected{% endif %}>Area</option>
+                <option value="Region" {% if selected_filter == "Region" %}selected{% endif %}>Region</option>
+                <option value="Effects" {% if selected_filter == "Effects" %}selected{% endif %}>Effects</option>
+                <option value="Description" {% if selected_filter == "Description" %}selected{% endif %}>Description</option>
+            </select>
+            Hakusana:
+            {% if keyword %}
+            <input type="text" name="keyword" value="{{ keyword }}" />
+            {% else %}
+            <input type="text" name="keyword" />
+            {% endif %}
+            <button type="submit">Filter</button>
+        </form>
         {% for plant in plants %}
         <p>
             <a href="/plants/{{ plant.name }}">{{ plant.name }}</a>
