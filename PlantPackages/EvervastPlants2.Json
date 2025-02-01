@@ -1,0 +1,114 @@
+[
+    {
+        "name": "Alberry",
+        "rarity": "Rare",
+        "Area": ["Arctic","Forest","Swamp"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Ellaria"],
+        "Effects": ["Stamina","Poison","Speed"],
+        "Description": "This transparent, black berry contains poisonous seeds and grows on long, straight stalks."
+    },
+    {
+        "name": "Mormusflower",
+        "rarity": "Very Rare",
+        "Area": ["Coast","Desert","Plains"],
+        "Region": ["Jyrnimm", "Ekobis", "Arcalus", "Ylaidya"],
+        "Effects": ["Dexterity", "Dexterity"],
+        "Description": "This flower is easily confused for an ordinary Wildleaf, however it is set apart by it's blood red center. It grows among wildleafs."
+    },
+    {
+        "name": "Wildleaf",
+        "rarity": "Common",
+        "Area": ["Plains","Forest","Mountain","Swamp","Jungle"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Vitality"],
+        "Description": "A small, white flower with a yellow centre."
+    },
+    {
+        "name": "Wolfthorn",
+        "rarity": "Rare",
+        "Area": ["Arctic","Plains","Forest","Mountain"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Ellaria"],
+        "Effects": ["Speed", "Strength"],
+        "Description": "This gray thorny vine surrounds rocks and trees. Upon closer inspection, the thorns seem to be black."
+    },
+    {
+        "name": "Bitterroot",
+        "rarity": "Rare",
+        "Area": ["Arctic","Coast","Desert","Forest","Mountain","Swamp","Cave","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Poison","Constitution"],
+        "Description": "This root is a golden brown and very popular in elegant cusine. Poisonous if not prepared correctly."
+    },
+    {
+        "name": "Wither'len",
+        "rarity": "Very Rare",
+        "Area": ["Desert","Swamp","Jungle","Depths"],
+        "Region": ["Ekobis", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Poison","Poison","Arcana","Intelligence"],
+        "Description": "This elven flower has become rare after Godfall. It's petals are a black and it's center is a bright blue."
+    },
+    {
+        "name": "Riverbloom",
+        "rarity": "Uncommon",
+        "Area": ["Arctic","Coast","Plains","Forest","Mountain","Swamp","Jungle","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Poison","Frost"],
+        "Description": "This yellow and blue flower grows within rivers and streams. They emit a sweet, honey-like smell."
+    },
+    {
+        "name": "Larari'len",
+        "rarity": "Legendary",
+        "Area": ["Coast","Desert","Plains","Forest","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Vitality","Medication","Medication","Resistance"],
+        "Description": "This flower, named after the god of food and health, is a legend among druids. It is said to be one of the most potent natural cures."
+    },
+    {
+        "name": "Rose of Yrwir",
+        "rarity": "Very Rare",
+        "Area": ["Arctic","Coast","Desert","Plains","Forest","Mountain","Swamp","Jungle","Cave","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Poison","Poison","Arcana","Intelligence"],
+        "Description": "This golden flower grows wherever the veil between the Worldplane and the Abyss were weak. It turns to ash within weeks of first blossoming."
+    },
+    {
+        "name": "Grimmblight",
+        "rarity": "Very Rare",
+        "Area": ["Desert","Forest","Cave","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Poison","Poison","Strength","Resistance"],
+        "Description": "A light blue rose, but it's petals are made of a black, oily substance. It's thorns are sharp and black and is regared as an omen of ill fate"
+    },
+    {
+        "name": "Elderthron",
+        "rarity": "Rare",
+        "Area": ["Arctic","Coast","Forest","Mountain","Swamp","Jungle","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Vitality","Intelligence"],
+        "Description": "This thick, thorny plant contains a delicious, addictive goo. It's also said to increase intelligence. Once used commonly among shamans and elders."
+    },
+    {
+        "name": "Greatberry",
+        "rarity": "Very Rare",
+        "Area": ["Arctic","Coast","Desert","Plains","Forest","Mountain","Swamp","Jungle","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Arcana", "Speed", "Poison", "Strength"],
+        "Description": "This bush grows nearly everywhere, hence it's name. Legends tell this berry was used to poison the last king of Lynnwind."
+    },
+    {
+        "name": "Hagstalk",
+        "rarity": "Uncommon",
+        "Area": ["Forest","Swamp","Jungle","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Enhance","Resistance","Resistance"],
+        "Description": "This dark orange weed is known as an omen of a nerby hag. Hiding some under someone's pillow is said to curse them with misfortune."
+    },
+    {
+        "name": "Rotbloom",
+        "rarity": "Uncommon",
+        "Area": ["Arctic","Coast","Desert","Mountain","Swamp","Cave","Depths"],
+        "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
+        "Effects": ["Poison","Constitution"],
+        "Description": "This budding red flower growns on rotting corpses. Those who die to it's poison emit a horrible scent"
+    }
+]
