@@ -27,8 +27,8 @@ def get_plants_by(keyword, filter):
             sql = "SELECT * FROM plants WHERE Description LIKE ? ORDER BY Description"
     result = db.query(sql, ["%"+keyword+"%"])
     if keyword == "":
-        sql = "SELECT * FROM plants ORDER BY ?"
-        return db.query(sql, [filter])
+        sql = f"SELECT * FROM plants ORDER BY {filter}"
+        return db.query(sql)
     return result
 
         

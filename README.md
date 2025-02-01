@@ -18,6 +18,7 @@ This application is an addition to my D&D campaign, which allows players to sear
 - Plant packages can be downloaded by uploading a plant JSON. You can toggle if the download overrides any existing plants. 
 - These plants are exported to the catalogue, a listing of all available plants. These plants can be further edited or removed.
 - The catalogue also supports a search system, with a filter drop-down box based on which attribute the user wants to find the plant.
+- The catalogue also orders the plants, but currently only alphabetically.
 - The search keyword and filter are stored in the session for a satisfying user experience and reset once the user leaves the catalogue.
 
 # Future plans
