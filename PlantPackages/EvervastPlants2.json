@@ -69,7 +69,7 @@
         "Area": ["Arctic","Coast","Desert","Plains","Forest","Mountain","Swamp","Jungle","Cave","Depths"],
         "Region": ["Jyrnimm", "Ekobis", "Amalra", "Worngar", "Arcalus", "Ylaidya", "Ellaria"],
         "Effects": ["Poison","Poison","Arcana","Intelligence"],
-        "Description": "This golden flower grows wherever the veil between the Worldplane and the Abyss were weak. It turns to ash within weeks of first blossoming."
+        "Description": "This golden flower grows wherever the veil between the Worldplane and the Abyss is weak. It turns to ash within weeks of first blossoming."
     },
     {
         "name": "Grimmblight",
