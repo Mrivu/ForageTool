@@ -28,7 +28,7 @@ def user():
             if check_password_hash(password_hash, password):
                 session["username"] = username
                 return redirect("/")
-        return render_template("main.html", message="VIRHE: väärä tunnus tai salasana")
+        return render_template("main.html", message="Incorrect username or password")
 
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -38,15 +38,18 @@ def register():
         username = request.form["username"]
         password1 = request.form["password1"]
         password2 = request.form["password2"]
+        print(username, password1, password2)
+        if username == "" or password1 == "":
+            return render_template("register.html", message = "The password and the username can't be empty")
         if password1 != password2:
-            return render_template("register.html", message = "VIRHE: salasanat eivät ole samat")
+            return render_template("register.html", message = "The passwords don't match")
         password_hash = generate_password_hash(password1)
 
         try:
             sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
             db.execute(sql, [username, password_hash])
         except sqlite3.IntegrityError:
-            return render_template("register.html", message = "VIRHE: tunnus on jo varattu")
+            return render_template("register.html", message = f"The username {username} is aready taken")
 
         session["username"] = username
         return redirect("/")

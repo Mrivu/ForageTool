@@ -25,11 +25,11 @@
         </form>
         {% for plant in plants %}
         <p>
-            <a href="/plants/{{ plant.name }}">{{ plant.name }}</a>
-            <form action="edit/{{ plant.name }}">
+            <a href="/plants/{{ plant.Name }}">{{ plant.name }}</a>
+            <form action="edit/{{ plant.Name }}">
                 <button type="submit">Edit</button>
             </form>
-            <form action="delete/{{ plant.name }}">
+            <form action="delete/{{ plant.Name }}">
                 <button type="submit">Delete</button>
             </form>
         </p>
