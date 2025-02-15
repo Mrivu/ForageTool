@@ -1,8 +1,8 @@
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     password_hash TEXT,
-    admin BOOLEAN
+    isAdmin INTEGER
 );
 
 CREATE TABLE plants (

@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 import config
@@ -27,6 +27,9 @@ def user():
             password_hash = password_hash[0][0]
             if check_password_hash(password_hash, password):
                 session["username"] = username
+                getAdminStatus = "SELECT isAdmin FROM users WHERE username = ?"
+                isAdmin = db.query(getAdminStatus, [username])
+                session["isAdmin"] = isAdmin[0][0]
                 return redirect("/")
         return render_template("main.html", message="Incorrect username or password")
 
@@ -38,6 +41,8 @@ def register():
         username = request.form["username"]
         password1 = request.form["password1"]
         password2 = request.form["password2"]
+        isAdmin = request.form.get("admin", "no")
+        isAdmin = 0 if isAdmin == "no" else 1
         print(username, password1, password2)
         if username == "" or password1 == "":
             return render_template("register.html", message = "The password and the username can't be empty")
@@ -46,12 +51,13 @@ def register():
         password_hash = generate_password_hash(password1)
 
         try:
-            sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
-            db.execute(sql, [username, password_hash])
+            sql = "INSERT INTO users (username, password_hash, isAdmin) VALUES (?, ?, ?)"
+            db.execute(sql, [username, password_hash, isAdmin])
         except sqlite3.IntegrityError:
             return render_template("register.html", message = f"The username {username} is aready taken")
 
         session["username"] = username
+        session["isAdmin"] = isAdmin
         return redirect("/")
     
 @app.route("/logout")
@@ -74,6 +80,8 @@ def catalogue():
 
 @app.route("/import", methods = ["GET", "POST"])
 def import_plants():
+    if not session["isAdmin"]:
+        abort(403)
     if request.method == "GET":
         return render_template("import.html")
     if request.method == "POST":
@@ -100,6 +108,8 @@ def view_plant(name):
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
 def edit_plant(name):
+    if not session["isAdmin"]:
+        abort(403)
     if request.method == "GET":
         plant = commands.get_plant(name)
         return render_template("edit.html", plant=plant, message="")
@@ -117,6 +127,8 @@ def edit_plant(name):
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
 def delete_plant(name):
+    if not session["isAdmin"]:
+        abort(403)
     if request.method == "GET":
         plant = commands.get_plant(name)
         return render_template("delete.html", plant=plant)

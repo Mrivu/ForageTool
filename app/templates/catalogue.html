@@ -26,12 +26,14 @@
         {% for plant in plants %}
         <p>
             <a href="/plants/{{ plant.plantName }}">{{ plant.plantName }}</a>
+            {% if session.isAdmin %}
             <form action="edit/{{ plant.plantName }}">
                 <button type="submit">Edit</button>
             </form>
             <form action="delete/{{ plant.plantName }}">
                 <button type="submit">Delete</button>
             </form>
+            {% endif %}
         </p>
         {% endfor %}
         <a href="/">Go back</a>

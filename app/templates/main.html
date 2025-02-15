@@ -11,9 +11,11 @@
   <form action="/catalogue">
     <button type="submit">See plant catalogue</button>
   </form>
-  <form action="/import">
-      <button type="submit">Import Plants (Admin)</button>
-  </form>
+    {% if session.isAdmin %}
+    <form action="/import">
+        <button type="submit">Import Plants (Admin)</button>
+    </form>
+    {% endif %}
   <p>
     <a href="/logout">Log out</a>
   </p>
