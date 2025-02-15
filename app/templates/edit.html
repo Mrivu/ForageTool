@@ -6,18 +6,18 @@
 
     <body>
         {% if plant %}
-        <form action="/edit/{{ plant.Name }}" method="POST">
-            <h1>{{ plant.Name }}</h1>
-            <input type="text" name="Name" value="{{ plant.Name }}">
-            <h2>{{ plant.Rarity }} plant</h2>
-            <input type="text" name="Rarity" value="{{ plant.Rarity }}">
-            <h2>Found in {{ plant.Area }} in {{ plant.Region }}</h2>
-            <input type="text" name="Area" value="{{ plant.Area }}">
-            <input type="text" name="Region" value="{{ plant.Region }}">
-            <h2>Effects: {{ plant.Effects }}</h2>
-            <input type="text" name="Effects" value="{{ plant.Effects }}">
-            <h2>"{{ plant.Description }}"</h2>
-            <input type="text" name="Description" value="{{ plant.Description }}">
+        <form action="/edit/{{ plant.plantName }}" method="POST">
+            <h1>{{ plant.plantName }}</h1>
+            <input type="text" name="Name" value="{{ plant.plantName }}">
+            <h2>{{ plant.rarity }} plant</h2>
+            <input type="text" name="Rarity" value="{{ plant.rarity }}">
+            <h2>Found in {{ plant.plantAreas.replace(",", ", ") }} in {{ plant.plantRegions.replace(",", ", ") }}</h2>
+            <input type="text" name="Area" value="{{ plant.plantAreas }}">
+            <input type="text" name="Region" value="{{ plant.plantRegions }}">
+            <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
+            <input type="text" name="Effects" value="{{ plant.plantEffects }}">
+            <h2>"{{ plant.plantDescription }}"</h2>
+            <input type="text" name="Description" value="{{ plant.plantDescription }}">
             <button type="submit" name="button" value="Save">Save changes</button>
         </form>
         {% else %}

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>Delete {{ plant.Name }}</title>
+    <title>Delete {{ plant.plantName }}</title>
     </head>
 
     <body>
-        <h1>Are you sure you want to delete {{ plant.Name }} from the Catalogue?</h1>
-        <form action="/delete/{{ plant.name }}" method="POST">
+        <h1>Are you sure you want to delete {{ plant.plantName }} from the Catalogue?</h1>
+        <form action="/delete/{{ plant.plantName }}" method="POST">
             <button type="submit" name="button" value="yes">YES</button>
             <button type="submit" name="button" value="no">NO</button>
         </form>

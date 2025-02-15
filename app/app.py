@@ -70,7 +70,7 @@ def catalogue():
         Plants = commands.get_plants_by(keyword, selected_filter)
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
-        return render_template("catalogue.html", message = "", plants=Plants, keyword=keyword, selected_filter=session["selected_filter"])
+        return render_template("catalogue.html", message = "", plants=Plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
 
 @app.route("/import", methods = ["GET", "POST"])
 def import_plants():
@@ -83,32 +83,14 @@ def import_plants():
             try:
                 data = json.load(file)
                 for plant in data:
-                    plantInsert = "INSERT INTO plants (name, rarity, Area, Region, Effects, description) VALUES (?, ?, ?, ?, ?, ?)"
-                    Areas = "" 
-                    Regions = "" 
-                    Effects = ""
-                    for i in plant["Area"]:
-                        Areas += i + ", "
-                    for i in plant["Region"]:
-                        Regions += i + ", "
-                    for i in plant["Effects"]:
-                        Effects += i + ", "
-                    Areas, Regions, Effects = Areas[:-2], Regions[:-2], Effects[:-2]
                     existingPlant = commands.get_plant(plant["name"])
                     if existingPlant and overwrite == "yes":
-                        plantUpdate = """
-                        UPDATE plants
-                        SET Rarity = ?, Area = ?, Region = ?, Effects = ?, Description = ?
-                        WHERE Name = ?
-                        """
-                        db.execute(plantUpdate, [plant["rarity"], Areas, Regions, Effects, plant["Description"], plant["name"]])
+                        commands.override_plant(plant)
                     elif not existingPlant:
-                        db.execute(plantInsert, (plant["name"], plant["rarity"], Areas, Regions, Effects, plant["Description"]))
+                        commands.insert_plant(plant)
                 return render_template("import.html", message = "JSON file read successfully!")
             except json.JSONDecodeError:
                 return render_template("import.html", message = "Unable to read JSON file, invalid formatting")
-
-
     return render_template("import.html", message = "Invalid file type. Please upload a JSON file.")
 
 @app.route("/plants/<string:name>")
@@ -122,25 +104,15 @@ def edit_plant(name):
         plant = commands.get_plant(name)
         return render_template("edit.html", plant=plant, message="")
     if request.method == "POST":
-        plant = commands.get_plant(name)
-        
-        Name = request.form.get("Name")
-        Rarity = request.form.get("Rarity")
-        Area = request.form.get("Area")
-        Region = request.form.get("Region")
-        Effects = request.form.get("Effects")
-        Description = request.form.get("Description")
-
-        fields = [Name, Rarity, Area, Region, Effects, Description]
-        for field in fields:
-            if field == "":
-                return render_template("edit.html", plant=plant, message="A field cannot be empty")
-        sql = """
-        UPDATE plants
-        SET Name = ?, Rarity = ?, Area = ?, Region = ?, Effects = ?, Description = ?
-        WHERE Name = ?
-        """
-        db.execute(sql, [fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], plant["Name"]])
+        plant = {}
+        plant["name"] = request.form.get("Name")
+        plant["rarity"] = request.form.get("Rarity")
+        plant["Area"] = request.form.get("Area").split(",")
+        plant["Region"] = request.form.get("Region").split(",")
+        plant["Effects"] = request.form.get("Effects").split(",")
+        plant["Description"] = request.form.get("Description")
+        commands.delete_plant(name)
+        commands.insert_plant(plant)
         return redirect("/catalogue")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
@@ -151,7 +123,7 @@ def delete_plant(name):
     if request.method == "POST":
         action = request.form.get("button")
         if action == "yes":
-            db.execute("DELETE FROM plants WHERE name = ?", (name,))
+            commands.delete_plant(name)
             return redirect("/catalogue")
         elif action == "no":
             return redirect("/catalogue")
