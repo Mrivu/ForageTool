@@ -82,15 +82,14 @@ def get_plants_by(keyword, filter):
 def override_plant(plant):
     plantUpdate = """
     UPDATE plants
-    SET rarity = ?, rarityID = ?, plantDescription = ?
+    SET plantName = ?, rarity = ?, rarityID = ?, plantDescription = ?
     WHERE plantName = ?
     """
 
-    db.execute(plantUpdate, [plant["rarity"], rarity.check_rarity(plant["rarity"]), plant["Description"], plant["name"]]) 
-
-    db.execute("DELETE FROM area WHERE plantName = ?", [plant["name"]])
-    db.execute("DELETE FROM region WHERE plantName = ?", [plant["name"]])
-    db.execute("DELETE FROM effect WHERE plantName = ?", [plant["name"]])
+    db.execute("DELETE FROM area WHERE plantName = ?", [plant["oldName"]])
+    db.execute("DELETE FROM region WHERE plantName = ?", [plant["oldName"]])
+    db.execute("DELETE FROM effect WHERE plantName = ?", [plant["oldName"]])
+    db.execute(plantUpdate, [plant["name"], plant["rarity"], rarity.check_rarity(plant["rarity"]), plant["Description"], plant["oldName"]]) 
 
     for a in plant["Area"]:
         db.execute("INSERT OR IGNORE INTO area (plantName, areaName) VALUES (?, ?)", [plant["name"], a])
@@ -131,7 +130,4 @@ def insert_plant(plant):
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], i, value])
 
 def delete_plant(name):
-    db.execute("DELETE FROM area WHERE plantName = ?", [name])
-    db.execute("DELETE FROM region WHERE plantName = ?", [name])
-    db.execute("DELETE FROM effect WHERE plantName = ?", [name])
     db.execute("DELETE FROM plants WHERE plantName = ?", [name])

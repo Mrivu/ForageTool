@@ -115,14 +115,14 @@ def edit_plant(name):
         return render_template("edit.html", plant=plant, message="")
     if request.method == "POST":
         plant = {}
+        plant["oldName"] = name
         plant["name"] = request.form.get("Name")
         plant["rarity"] = request.form.get("Rarity")
         plant["Area"] = request.form.get("Area").split(",")
         plant["Region"] = request.form.get("Region").split(",")
         plant["Effects"] = request.form.get("Effects").split(",")
         plant["Description"] = request.form.get("Description")
-        commands.delete_plant(name)
-        commands.insert_plant(plant)
+        commands.override_plant(plant)
         return redirect("/catalogue")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])

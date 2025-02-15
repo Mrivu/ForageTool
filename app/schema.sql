@@ -26,15 +26,15 @@ CREATE TABLE area (
     plantName TEXT,
     areaName TEXT,
     PRIMARY KEY (plantName, areaName),
-    FOREIGN KEY (plantName) REFERENCES plants (plantName),
-    FOREIGN KEY (areaName) REFERENCES areas (areaName)
+    FOREIGN KEY (plantName) REFERENCES plants (plantName) ON DELETE CASCADE,
+    FOREIGN KEY (areaName) REFERENCES areas (areaName) 
 );
 
 CREATE TABLE region (
     plantName TEXT,
     regionName TEXT,
     PRIMARY KEY (plantName, regionName),
-    FOREIGN KEY (plantName) REFERENCES plants (plantName),
+    FOREIGN KEY (plantName) REFERENCES plants (plantName) ON DELETE CASCADE,
     FOREIGN KEY (regionName) REFERENCES regions (regionName)
 );
 
@@ -43,6 +43,6 @@ CREATE TABLE effect (
     plantName TEXT,
     effectName TEXT,
     PRIMARY KEY (plantName, effectName, repeats),
-    FOREIGN KEY (plantName) REFERENCES plants (plantName),
+    FOREIGN KEY (plantName) REFERENCES plants (plantName) ON DELETE CASCADE,
     FOREIGN KEY (effectName) REFERENCES effects (effectName)
 );
