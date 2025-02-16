@@ -20,10 +20,12 @@ This application is an addition to my D&D campaign, which allows players to sear
 - The catalogue also supports a search system, with a filter drop-down box based on which attribute the user wants to find the plant.
 - The catalogue also orders the plants, but currently only alphabetically.
 - The search keyword and filter are stored in the session for a satisfying user experience and reset once the user leaves the catalogue.
+- The user can forage for plants, which are added to their inventory.
+- The user can change user setting and see statistics form the profile panel
+- Admin users can import plants
 
 # Future plans
-- Add Admin system and restrict user actions
-- Add inventory for found plants and user page
+- Add folders to store plants more effectively
 
 # Guide
 - A valid plant JSON can be found under the plant Packages folder at "/ForageTool/PlantPackages/EvervastPlants2.json".
