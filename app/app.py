@@ -30,6 +30,8 @@ def user():
                 getAdminStatus = "SELECT isAdmin FROM users WHERE username = ?"
                 isAdmin = db.query(getAdminStatus, [username])
                 session["isAdmin"] = isAdmin[0][0]
+                getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
+                session["userID"] = getID[0][0]
                 return redirect("/")
         return render_template("main.html", message="Incorrect username or password")
 
@@ -58,6 +60,8 @@ def register():
 
         session["username"] = username
         session["isAdmin"] = isAdmin
+        getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
+        session["userID"] = getID[0][0]
         return redirect("/")
     
 @app.route("/logout")
@@ -78,6 +82,19 @@ def catalogue():
         session["selected_filter"] = selected_filter
         return render_template("catalogue.html", message = "", plants=Plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
 
+@app.route("/inventory", methods = ["GET", "POST"])
+def inventory():
+    if request.method == "GET":
+        inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
+        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"])
+    if request.method == "POST":
+        selected_filter = request.form["filter"]
+        keyword = request.form["keyword"]
+        inventory = commands.get_inventory(session["userID"], keyword, selected_filter)
+        session["keyword"] = keyword
+        session["selected_filter"] = selected_filter
+        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"])
+
 @app.route("/import", methods = ["GET", "POST"])
 def import_plants():
     if not session["isAdmin"]:
@@ -93,7 +110,7 @@ def import_plants():
                 for plant in data:
                     existingPlant = commands.get_plant(plant["name"])
                     if existingPlant and overwrite == "yes":
-                        commands.override_plant(plant)
+                        commands.override_plant(plant, plant["name"])
                     elif not existingPlant:
                         commands.insert_plant(plant)
                 return render_template("import.html", message = "JSON file read successfully!")
@@ -115,14 +132,13 @@ def edit_plant(name):
         return render_template("edit.html", plant=plant, message="")
     if request.method == "POST":
         plant = {}
-        plant["oldName"] = name
         plant["name"] = request.form.get("Name")
         plant["rarity"] = request.form.get("Rarity")
         plant["Area"] = request.form.get("Area").split(",")
         plant["Region"] = request.form.get("Region").split(",")
         plant["Effects"] = request.form.get("Effects").split(",")
         plant["Description"] = request.form.get("Description")
-        commands.override_plant(plant)
+        commands.override_plant(plant, name)
         return redirect("/catalogue")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])

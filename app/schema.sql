@@ -1,8 +1,17 @@
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userID INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     password_hash TEXT,
     isAdmin INTEGER
+);
+
+CREATE TABLE inventory (
+    userID INTEGER,
+    plantName TEXT,
+    quantity INTEGER,
+    PRIMARY KEY (userID, plantName),
+    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE,
+    FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
 CREATE TABLE plants (
