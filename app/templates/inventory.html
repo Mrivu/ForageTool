@@ -23,11 +23,11 @@
             {% endif %}
             <button type="submit">Filter</button>
         </form>
+        <a href="/">Go back</a>
         {% for plant in inventory %}
         <p>
-            <a href="/plants/{{ plant.plantName }}">{{ plant.plantName }} - {{ plant.quantity }}</a>
+            <a href="/plants/{{ plant.plantName }}?source=inventory">{{ plant.plantName }} - {{ plant.quantity }}</a>
         </p>
         {% endfor %}
-        <a href="/">Go back</a>
     </body>
 </html>

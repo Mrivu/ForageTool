@@ -184,5 +184,13 @@ def insert_plant(plant):
             value = repeats[0][0]+1
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], i, value])
 
+def add_to_inventory(plant, user_id):
+    result = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [user_id, plant["plantName"]])
+    if result:
+        quantity = result[0][0] + 1
+        db.execute("UPDATE inventory SET quantity = ? WHERE userID = ? AND plantName = ?", [quantity, user_id, plant["plantName"]])
+    else:
+        db.execute("INSERT INTO inventory (userID, plantName, quantity) VALUES (?, ?, ?)", [user_id, plant["plantName"], 1])
+
 def delete_plant(name):
     db.execute("DELETE FROM plants WHERE plantName = ?", [name])

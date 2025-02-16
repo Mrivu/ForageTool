@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Forage</title>
+</head>
+
+<body>
+  <form action="/forage" method="POST">
+    <p>
+    Bonus: {{ session.forageBonus }}
+    <label for="extraBonus">Extra Bonus:</label>
+    <input type="text" name="extraBonus" />
+    </p>
+    <p>
+    Multiplier: {{ session.forageMultiplier }}
+    <label for="plantAvailability">Availability:</label>
+    <input type="text" name="plantAvailability" />
+    </p>
+    <label for="areas">Area:</label>
+        <select name="areas" id="areas">
+        {% for area in areas %}
+          <option value="{{ area.areaName }}">{{ area.areaName }}</option>
+        {% endfor %}
+        </select>
+    <label for="regions">Area:</label>
+        <select name="regions" id="regions">
+        {% for region in regions %}
+          <option value="{{ region.regionName }}">{{ region.regionName }}</option>
+        {% endfor %}
+        </select>
+    <button type="submit" name="button" value="Roll">Roll forage check</button>
+    <a href="/">Go back</a>
+    <h1>{{ message }}</h1>
+  </form>
+</body>
+
+</html>

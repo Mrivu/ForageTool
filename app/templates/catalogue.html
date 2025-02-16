@@ -23,9 +23,10 @@
             {% endif %}
             <button type="submit">Filter</button>
         </form>
+        <a href="/">Go back</a>
         {% for plant in plants %}
         <p>
-            <a href="/plants/{{ plant.plantName }}">{{ plant.plantName }}</a>
+            <a href="/plants/{{ plant.plantName }}?source=catalogue">{{ plant.plantName }}</a>
             {% if session.isAdmin %}
             <form action="edit/{{ plant.plantName }}">
                 <button type="submit">Edit</button>
@@ -36,6 +37,5 @@
             {% endif %}
         </p>
         {% endfor %}
-        <a href="/">Go back</a>
     </body>
 </html>

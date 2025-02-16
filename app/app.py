@@ -6,6 +6,9 @@ import db
 import config
 import json
 import commands
+import random
+import math
+import rarity
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -32,6 +35,10 @@ def user():
                 session["isAdmin"] = isAdmin[0][0]
                 getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
                 session["userID"] = getID[0][0]
+                bonus = db.query("SELECT bonus FROM users where username = ?", [session["username"]])
+                session["forageBonus"] = bonus[0][0]
+                multiplier = db.query("SELECT multiplier FROM users where username = ?", [session["username"]])
+                session["forageMultiplier"] = multiplier[0][0]
                 return redirect("/")
         return render_template("main.html", message="Incorrect username or password")
 
@@ -43,6 +50,8 @@ def register():
         username = request.form["username"]
         password1 = request.form["password1"]
         password2 = request.form["password2"]
+        bonus = int(request.form["bonus"])
+        multiplier = int(request.form["multiplier"])
         isAdmin = request.form.get("admin", "no")
         isAdmin = 0 if isAdmin == "no" else 1
         print(username, password1, password2)
@@ -53,13 +62,15 @@ def register():
         password_hash = generate_password_hash(password1)
 
         try:
-            sql = "INSERT INTO users (username, password_hash, isAdmin) VALUES (?, ?, ?)"
-            db.execute(sql, [username, password_hash, isAdmin])
+            sql = "INSERT INTO users (username, password_hash, isAdmin, forageBonus, forageMultiplier) VALUES (?, ?, ?, ?, ?)"
+            db.execute(sql, [username, password_hash, isAdmin, bonus, multiplier])
         except sqlite3.IntegrityError:
             return render_template("register.html", message = f"The username {username} is aready taken")
 
         session["username"] = username
         session["isAdmin"] = isAdmin
+        session["forageBonus"] = bonus
+        session["forageMultiplier"] = multiplier
         getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
         session["userID"] = getID[0][0]
         return redirect("/")
@@ -94,6 +105,46 @@ def inventory():
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
         return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"])
+    
+@app.route("/forage", methods = ["GET", "POST"])
+def forage():
+    if request.method == "GET":
+       areas = db.query("SELECT * FROM areas")
+       regions = db.query("SELECT * FROM regions")
+       return render_template("forage.html", message="", areas=areas, regions=regions)
+    if request.method == "POST":
+        extraBonus = int(request.form.get("extraBonus") or 0)
+        availability = int(request.form.get("plantAvailability") or 0)
+        area = request.form["areas"]
+        region = request.form["regions"]
+        print(extraBonus, availability, area, region)
+        diceroll = random.randint(1,20)+session["forageBonus"]+extraBonus
+        print(diceroll)
+        plantAmount = math.floor(diceroll / 10)+availability
+        ## Check nat 20
+        if (diceroll -  session["forageBonus"] - extraBonus) == 20:
+            plantAmount += 1
+        plantAmount = (plantAmount) * int(session["forageMultiplier"])
+        print(plantAmount)
+        if (diceroll > 40):
+            diceroll = 40
+        elif (diceroll < 1):
+            diceroll = 1
+        weights = [rarity.rollResults[diceroll-1]["Common"],
+           rarity.rollResults[diceroll-1]["Uncommon"],
+           rarity.rollResults[diceroll-1]["Rare"],
+           rarity.rollResults[diceroll-1]["Very Rare"],
+           rarity.rollResults[diceroll-1]["Legendary"]]
+        if sum(weights) > 0:
+            rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
+            for r in rarityResults:
+                sql = "SELECT * FROM plants WHERE rarityID = ? ORDER BY RANDOM() LIMIT 1"
+                plant_found = db.query(sql, [r])
+                commands.add_to_inventory(plant_found[0], session["userID"])
+        areas = db.query("SELECT * FROM areas")
+        regions = db.query("SELECT * FROM regions")
+        return render_template("forage.html", message=f"You rolled a {diceroll}", areas=areas, regions=regions)
+        
 
 @app.route("/import", methods = ["GET", "POST"])
 def import_plants():
@@ -121,7 +172,8 @@ def import_plants():
 @app.route("/plants/<string:name>")
 def view_plant(name):
     plant = commands.get_plant(name)
-    return render_template("plant.html", plant=plant)
+    source = request.args.get("source", "catalogue")
+    return render_template("plant.html", plant=plant, source=source)
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
 def edit_plant(name):
