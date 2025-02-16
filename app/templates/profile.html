@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Profile</title>
+</head>
+
+<body>
+  <form action="/profile" method="POST">
+    <p>
+      Username: <br />
+      <input type="text" name="username" value="{{user.username }}"/>
+    </p>
+    <p>
+      Enter Forage bonus <br />
+      <input type="text" name="bonus" value="{{ user.forageBonus }}"/>
+    </p>
+    <p>
+      Enter forage Multiplier <br />
+      <input type="text" name="multiplier" value="{{ user.forageMultiplier }}"/>
+    </p>
+    <label>
+      <input type="checkbox" name="admin" value="yes" {% if session.isAdmin %}checked{% endif %}> Admin user?
+    </label>
+    <input type="submit" value="saved"/>
+    <a href="/">Go back</a>
+    <h1>{{ message }}</h1>
+  </form>
+</body>
+
+</html>

@@ -35,9 +35,9 @@ def user():
                 session["isAdmin"] = isAdmin[0][0]
                 getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
                 session["userID"] = getID[0][0]
-                bonus = db.query("SELECT bonus FROM users where username = ?", [session["username"]])
+                bonus = db.query("SELECT forageBonus FROM users where username = ?", [session["username"]])
                 session["forageBonus"] = bonus[0][0]
-                multiplier = db.query("SELECT multiplier FROM users where username = ?", [session["username"]])
+                multiplier = db.query("SELECT forageMultiplier FROM users where username = ?", [session["username"]])
                 session["forageMultiplier"] = multiplier[0][0]
                 return redirect("/")
         return render_template("main.html", message="Incorrect username or password")
@@ -168,6 +168,38 @@ def import_plants():
             except json.JSONDecodeError:
                 return render_template("import.html", message = "Unable to read JSON file, invalid formatting")
     return render_template("import.html", message = "Invalid file type. Please upload a JSON file.")
+
+@app.route("/profile", methods = ["GET", "POST"])
+def profile():
+    if request.method == "GET":
+        user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
+        return render_template("profile.html", message = "", user=user)
+    if request.method == "POST":
+        user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
+        username = request.form["username"]
+        bonus = int(request.form["bonus"])
+        multiplier = int(request.form["multiplier"])
+        isAdmin = request.form.get("admin", "no")
+        isAdmin = 0 if isAdmin == "no" else 1
+        if username == "":
+            return render_template("profile.html", message = "The password and the username can't be empty", user=user)
+        try:
+            sql = """
+                UPDATE users 
+                SET username = ?, isAdmin = ?, forageBonus = ?, forageMultiplier = ?
+                WHERE userID = ?
+            """
+            db.execute(sql, [username, isAdmin, bonus, multiplier, session["userID"]])
+        except sqlite3.IntegrityError:
+            return render_template("profile.html", message=f"The username {username} is already taken", user=user)
+
+        session["username"] = username
+        session["isAdmin"] = isAdmin
+        session["forageBonus"] = bonus
+        session["forageMultiplier"] = multiplier
+        getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
+        session["userID"] = getID[0][0]
+        return redirect("/")
 
 @app.route("/plants/<string:name>")
 def view_plant(name):
