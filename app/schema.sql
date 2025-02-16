@@ -7,6 +7,13 @@ CREATE TABLE users (
     forageMultiplier INTEGER
 );
 
+CREATE TABLE statistics (
+    userID INTEGER PRIMARY KEY,
+    timesForaged INTEGER DEFAULT 0,
+    highestRarity TEXT DEFAULT "None",
+    FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
+);
+
 CREATE TABLE inventory (
     userID INTEGER,
     plantName TEXT,

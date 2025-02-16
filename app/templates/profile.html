@@ -22,7 +22,9 @@
     <label>
       <input type="checkbox" name="admin" value="yes" {% if session.isAdmin %}checked{% endif %}> Admin user?
     </label>
-    <input type="submit" value="saved"/>
+    <input type="submit" value="Save and Exit"/>
+    <h1>Times Foraged: {{ statistics.timesForaged }}</h1>
+    <h1>Rarest plant found: {{ statistics.highestRarity }}</h1>
     <a href="/">Go back</a>
     <h1>{{ message }}</h1>
   </form>

@@ -73,6 +73,7 @@ def register():
         session["forageMultiplier"] = multiplier
         getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
         session["userID"] = getID[0][0]
+        db.execute("INSERT INTO statistics (userID) VALUES (?)", [session["userID"]])
         return redirect("/")
     
 @app.route("/logout")
@@ -143,6 +144,13 @@ def forage():
                 commands.add_to_inventory(plant_found[0], session["userID"])
         areas = db.query("SELECT * FROM areas")
         regions = db.query("SELECT * FROM regions")
+        
+        # Statistics
+        db.execute("UPDATE statistics SET timesForaged = timesForaged + 1 WHERE userID = ?", [session["userID"]])
+        plants = commands.get_inventory(session["userID"], "", "Rarity")
+        if plants:
+            db.execute("UPDATE statistics SET highestRarity = ? WHERE userID = ?", [plants[-1]["rarity"], session["userID"]])
+
         return render_template("forage.html", message=f"You rolled a {diceroll}", areas=areas, regions=regions)
         
 
@@ -172,9 +180,11 @@ def import_plants():
 @app.route("/profile", methods = ["GET", "POST"])
 def profile():
     if request.method == "GET":
+        statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
         user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
-        return render_template("profile.html", message = "", user=user)
+        return render_template("profile.html", message = "", user=user, statistics=statistics)
     if request.method == "POST":
+        statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
         user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
         username = request.form["username"]
         bonus = int(request.form["bonus"])
@@ -182,7 +192,7 @@ def profile():
         isAdmin = request.form.get("admin", "no")
         isAdmin = 0 if isAdmin == "no" else 1
         if username == "":
-            return render_template("profile.html", message = "The password and the username can't be empty", user=user)
+            return render_template("profile.html", message = "The password and the username can't be empty", user=user, statistics=statistics)
         try:
             sql = """
                 UPDATE users 
@@ -191,7 +201,7 @@ def profile():
             """
             db.execute(sql, [username, isAdmin, bonus, multiplier, session["userID"]])
         except sqlite3.IntegrityError:
-            return render_template("profile.html", message=f"The username {username} is already taken", user=user)
+            return render_template("profile.html", message=f"The username {username} is already taken", user=user, statistics=statistics)
 
         session["username"] = username
         session["isAdmin"] = isAdmin
