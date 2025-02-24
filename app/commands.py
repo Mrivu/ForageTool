@@ -1,5 +1,6 @@
 import db
 import rarity
+import sqlite3
 
 filterReference = {
             "Name": "p.plantName",
@@ -194,3 +195,69 @@ def add_to_inventory(plant, user_id):
 
 def delete_plant(name):
     db.execute("DELETE FROM plants WHERE plantName = ?", [name])
+
+def new_folder(id, name):
+    sql = """
+    INSERT INTO folders (userID, folderName) VALUES (?, ?)
+    """
+    db.execute(sql, [id, name])
+
+def get_folder_plants(userID, folderName):
+    folderID = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])[0][0]
+    sql = """
+    SELECT p.plantName, fp.quantity
+    FROM folder fp
+    JOIN plants p ON fp.plantName = p.plantName
+    WHERE fp.folderID = ?
+    """
+    return db.query(sql, [folderID])
+
+def move_plant_to_folder(userID, folderName, plantName):
+    folder_rows = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])
+    folderID = folder_rows[0][0]
+    folder_contents = db.query("SELECT * FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])
+
+    if folder_contents:
+        sql =  """
+        UPDATE folder SET quantity = quantity + 1
+        WHERE folderID = ? AND plantName = ?
+        """
+        db.execute(sql, [folderID, plantName])
+    else:
+        sql =  """
+        INSERT INTO folder (folderID, plantName, quantity)
+        VALUES (?,?,1)
+        """
+        db.execute(sql, [folderID, plantName])
+    
+    plantQuantity = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [userID, plantName])
+    current_quantity = plantQuantity[0][0]
+    new_quantity = current_quantity - 1
+    
+    if new_quantity > 0:
+        sql = """
+        UPDATE inventory 
+        SET quantity = ? 
+        WHERE userID = ? AND plantName = ?
+        """
+        db.execute(sql, [new_quantity, userID, plantName])
+    else:
+        sql = """
+        DELETE FROM inventory 
+        WHERE userID = ? AND plantName = ?
+        """
+        db.execute(sql, [userID, plantName])
+
+def get_folders(userID):
+    folder_rows = db.query("SELECT * FROM folders WHERE userID = ?", [userID])
+    sql_count = "SELECT quantity FROM folder WHERE folderID = ?"
+    folders = {}
+    for folder in folder_rows:
+        folderName = folder["folderName"]
+        folderID = folder["folderID"]
+        quantities = db.query(sql_count, [folderID])
+        count = 0
+        for q in quantities:
+            count += q[0]
+        folders[folderName] = count
+    return folders

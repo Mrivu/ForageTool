@@ -23,6 +23,23 @@ CREATE TABLE inventory (
     FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
+CREATE TABLE folders (
+    folderID INTEGER PRIMARY KEY AUTOINCREMENT,
+    userID INTEGER,
+    folderName TEXT,
+    UNIQUE(userID, folderName),
+    FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
+);
+
+CREATE TABLE folder (
+    folderID INTEGER,
+    plantName TEXT,
+    quantity INTEGER DEFAULT 1,
+    PRIMARY KEY (folderID, plantName),
+    FOREIGN KEY (folderID) REFERENCES folders(folderID) ON DELETE CASCADE,
+    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE
+);
+
 CREATE TABLE plants (
     plantName TEXT PRIMARY KEY,
     rarity TEXT,

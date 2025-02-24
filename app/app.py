@@ -98,15 +98,45 @@ def catalogue():
 def inventory():
     if request.method == "GET":
         inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
-        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"])
+        folders = commands.get_folders(session["userID"])
+        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     if request.method == "POST":
+        folders = commands.get_folders(session["userID"])
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
         inventory = commands.get_inventory(session["userID"], keyword, selected_filter)
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
-        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"])
+        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     
+@app.route("/newFolder", methods = ["POST"])
+def newFolder():
+    if request.method == "POST":
+        folderName = request.form["newFolder"]
+        print(session["userID"])
+        commands.new_folder(session["userID"], folderName)
+    return redirect("/inventory")
+
+@app.route("/movePlant/<string:name>", methods = ["POST"])
+def move_plant(name):
+    if request.method == "POST":
+        folderName = request.form["folder"]
+        commands.move_plant_to_folder(session["userID"], folderName, name)
+    return redirect("/inventory")
+
+@app.route("/inventory/<string:name>", methods = ["GET"])
+def display_folder(name):
+    if request.method == "GET":
+        folder = commands.get_folder_plants(session["userID"], name)
+        return render_template("folder.html", message = "", name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
+    if request.method == "POST":
+        folder = commands.get_folder_plants(session["userID"], name)
+        selected_filter = request.form["filter"]
+        keyword = request.form["keyword"]
+        session["keyword"] = keyword
+        session["selected_filter"] = selected_filter
+        return render_template("folder.html", message = "", name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
+
 @app.route("/forage", methods = ["GET", "POST"])
 def forage():
     if request.method == "GET":
