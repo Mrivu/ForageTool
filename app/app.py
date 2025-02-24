@@ -60,10 +60,13 @@ def catalogue():
 @app.route("/inventory", methods = ["GET", "POST"])
 def inventory():
     users.require_login()
+    move_location = None
+    if session["moveLocation"] in commands.get_folders(session["userID"]):
+        move_location = session["moveLocation"]
     if request.method == "GET":
         inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
         folders = commands.get_folders(session["userID"])
-        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
+        return render_template("inventory.html", move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     if request.method == "POST":
         folders = commands.get_folders(session["userID"])
         selected_filter = request.form["filter"]
@@ -71,7 +74,7 @@ def inventory():
         inventory = commands.get_inventory(session["userID"], keyword, selected_filter)
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
-        return render_template("inventory.html", message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
+        return render_template("inventory.html", move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     
 @app.route("/newFolder", methods = ["POST"])
 def newFolder():
@@ -87,6 +90,7 @@ def move_plant(name):
     users.require_login()
     if request.method == "POST":
         folderName = request.form["folder"]
+        session["moveLocation"] = folderName
         commands.move_plant_to_folder(session["userID"], folderName, name)
     return redirect("/inventory")
 
@@ -116,32 +120,29 @@ def forage():
         availability = int(request.form.get("plantAvailability") or 0)
         area = request.form["areas"]
         region = request.form["regions"]
-        print(extraBonus, availability, area, region)
-        diceroll = random.randint(1,20)+session["forageBonus"]+extraBonus
-        print(diceroll)
-        plantAmount = math.floor(diceroll / 10)+availability
-        ## Check nat 20
-        if (diceroll -  session["forageBonus"] - extraBonus) == 20:
+        diceroll = random.randint(1,20)
+        total = diceroll+session["forageBonus"]+extraBonus
+        if diceroll == 20: ## Check nat 20
             plantAmount += 1
+        if (total > 40):
+            total = 40
+        elif (total < 1):
+            total = 1
+        plantAmount = math.floor(total / 10)+availability
         plantAmount = (plantAmount) * int(session["forageMultiplier"])
-        print(plantAmount)
-        if (diceroll > 40):
-            diceroll = 40
-        elif (diceroll < 1):
-            diceroll = 1
-        weights = [rarity.rollResults[diceroll-1]["Common"],
-           rarity.rollResults[diceroll-1]["Uncommon"],
-           rarity.rollResults[diceroll-1]["Rare"],
-           rarity.rollResults[diceroll-1]["Very Rare"],
-           rarity.rollResults[diceroll-1]["Legendary"]]
+        weights = [rarity.rollResults[total-1]["Common"],
+           rarity.rollResults[total-1]["Uncommon"],
+           rarity.rollResults[total-1]["Rare"],
+           rarity.rollResults[total-1]["Very Rare"],
+           rarity.rollResults[total-1]["Legendary"]]
         if sum(weights) > 0:
             rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
             for r in rarityResults:
                 sql = "SELECT * FROM plants WHERE rarityID = ? ORDER BY RANDOM() LIMIT 1"
                 plant_found = db.query(sql, [r])
                 commands.add_to_inventory(plant_found[0], session["userID"])
-        areas = db.query("SELECT * FROM areas")
-        regions = db.query("SELECT * FROM regions")
+        areas = db.query("SELECT * FROM areas WHERE areaName = ?", [area])
+        regions = db.query("SELECT * FROM regions WHERE regionName = ?", [region])
         
         # Statistics
         db.execute("UPDATE statistics SET timesForaged = timesForaged + 1 WHERE userID = ?", [session["userID"]])
@@ -149,7 +150,7 @@ def forage():
         if plants:
             db.execute("UPDATE statistics SET highestRarity = ? WHERE userID = ?", [plants[-1]["rarity"], session["userID"]])
 
-        return render_template("forage.html", message=f"You rolled a {diceroll}", areas=areas, regions=regions)
+        return render_template("forage.html", message=f"You rolled a {total}", areas=areas, regions=regions)
         
 
 @app.route("/import", methods = ["GET", "POST"])

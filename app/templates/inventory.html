@@ -42,7 +42,7 @@
             <label for="folder">Folder: </label>
             <select name="folder" id="folder">
                 {% for folderName, count in folders.items() %}
-                    <option value="{{ folderName }}">{{ folderName }}</option>
+                    <option value="{{ folderName }}" {% if move_location == folderName %}selected{% endif %}>{{ folderName }}</option>
                 {% endfor %}
             </select>
             <button type="submit">Move to folder</button>
