@@ -5,8 +5,8 @@
     </head>
 
     <body>
-        <form action="/inventory/{{ name}}" method = "POST">
-            <label for="filters">Sort by:</label>
+        <form action="/inventory/{{ name }}" method = "POST">
+            <label for="filters">Search in:</label>
             <select name="filter" id="filters">
                 <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
                 <option value="Rarity" {% if selected_filter == "Rarity" %}selected{% endif %}>Rarity</option>
@@ -15,7 +15,7 @@
                 <option value="Effects" {% if selected_filter == "Effects" %}selected{% endif %}>Effects</option>
                 <option value="Description" {% if selected_filter == "Description" %}selected{% endif %}>Description</option>
             </select>
-            Hakusana:
+            Keyword:
             {% if keyword %}
             <input type="text" name="keyword" value="{{ keyword }}" />
             {% else %}
@@ -23,10 +23,20 @@
             {% endif %}
             <button type="submit">Filter</button>
         </form>
+        <form action="/deleteFolder/{{ name }}" method = "POST">
+            <button type="submit">Delete Folder</button>
+        </form>
+        <form action="/renameFolder/{{ name }}" method = "POST">
+            <input type="text" name="newName" minlength="1" required/>
+            <button type="submit">Rename Folder</button>
+        </form>
         <a href="/inventory">Go back</a>
         {% for plant in folder %}
         <p>
             <a href="/plants/{{ plant.plantName }}?source={{ 'inventory/' ~ name }}">{{ plant.plantName }} - {{ plant.quantity }}</a>
+            <form action="/unfolder/{{ name }}/{{ plant.plantName }}" method = "POST">
+                <button type="submit">Return to Inventory</button>
+            </form>
         </p>
         {% endfor %}
     </body>

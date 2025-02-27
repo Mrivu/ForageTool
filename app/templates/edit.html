@@ -8,16 +8,16 @@
         {% if plant %}
         <form action="/edit/{{ plant.plantName }}" method="POST">
             <h1>{{ plant.plantName }}</h1>
-            <input type="text" name="Name" value="{{ plant.plantName }}">
+            <input type="text" name="Name" value="{{ plant.plantName }}" minlength="3" required>
             <h2>{{ plant.rarity }} plant</h2>
-            <input type="text" name="Rarity" value="{{ plant.rarity }}">
+            <input type="text" name="Rarity" value="{{ plant.rarity }}" minlength="1" required>
             <h2>Found in {{ plant.plantAreas.replace(",", ", ") }} in {{ plant.plantRegions.replace(",", ", ") }}</h2>
-            <input type="text" name="Area" value="{{ plant.plantAreas }}">
-            <input type="text" name="Region" value="{{ plant.plantRegions }}">
+            <input type="text" name="Area" value="{{ plant.plantAreas }}" minlength="2" required>
+            <input type="text" name="Region" value="{{ plant.plantRegions }}" minlength="2" required>
             <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
-            <input type="text" name="Effects" value="{{ plant.plantEffects }}">
+            <input type="text" name="Effects" value="{{ plant.plantEffects }}" minlength="2" required>
             <h2>"{{ plant.plantDescription }}"</h2>
-            <input type="text" name="Description" value="{{ plant.plantDescription }}">
+            <input type="text" name="Description" value="{{ plant.plantDescription }}" minlength="3" required>
             <button type="submit" name="button" value="Save">Save changes</button>
         </form>
         {% else %}

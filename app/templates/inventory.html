@@ -26,7 +26,7 @@
         <a href="/">Go back</a>
         <form action="/newFolder" method = "POST">
             <label for="newFolder">New Folder name: </label>
-            <input type="text" name="newFolder"/>
+            <input type="text" name="newFolder" minlength="1" required/>
             <button type="submit">Create new Folder</button>
         </form>
         {% for folderName, count in folders.items() %}

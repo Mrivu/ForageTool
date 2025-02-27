@@ -198,7 +198,7 @@ def delete_plant(name):
 
 def new_folder(id, name):
     sql = """
-    INSERT INTO folders (userID, folderName) VALUES (?, ?)
+    INSERT OR IGNORE INTO folders (userID, folderName) VALUES (?, ?)
     """
     db.execute(sql, [id, name])
 
@@ -212,27 +212,29 @@ def get_folder_plants(userID, folderName):
     """
     return db.query(sql, [folderID])
 
-def move_plant_to_folder(userID, folderName, plantName):
+def move_plant_to_folder(userID, folderName, plantName, change=1):
     folder_rows = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])
+    if not folder_rows:
+        raise ValueError(f"Folder '{folderName}' not found for user {userID}")
     folderID = folder_rows[0][0]
     folder_contents = db.query("SELECT * FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])
 
     if folder_contents:
         sql =  """
-        UPDATE folder SET quantity = quantity + 1
+        UPDATE folder SET quantity = quantity + ?
         WHERE folderID = ? AND plantName = ?
         """
-        db.execute(sql, [folderID, plantName])
+        db.execute(sql, [change, folderID, plantName])
     else:
         sql =  """
         INSERT INTO folder (folderID, plantName, quantity)
-        VALUES (?,?,1)
+        VALUES (?,?,?)
         """
-        db.execute(sql, [folderID, plantName])
+        db.execute(sql, [folderID, plantName, change])
     
     plantQuantity = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [userID, plantName])
     current_quantity = plantQuantity[0][0]
-    new_quantity = current_quantity - 1
+    new_quantity = current_quantity - change
     
     if new_quantity > 0:
         sql = """
@@ -248,6 +250,41 @@ def move_plant_to_folder(userID, folderName, plantName):
         """
         db.execute(sql, [userID, plantName])
 
+def unfolder(userID, folderName, plantName, change=1):
+    folder_rows = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])
+    if not folder_rows:
+        raise ValueError(f"Folder '{folderName}' not found for user {userID}")
+    folderID = folder_rows[0][0]
+    folder_quantity = db.query("SELECT quantity FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])[0][0]
+
+    inventory_quanity = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [userID, plantName])
+
+    if inventory_quanity:
+        sql = """
+        UPDATE inventory 
+        SET quantity = ? 
+        WHERE userID = ? AND plantName = ?
+        """
+        db.execute(sql, [inventory_quanity[0][0]+change, userID, plantName])
+    else:
+        sql = """
+        INSERT INTO inventory (quantity, userID, plantName) VALUES (?,?,?)
+        """
+        db.execute(sql, [change, userID, plantName])
+
+    if folder_quantity > 1:
+        sql =  """
+        UPDATE folder SET quantity = quantity - ?
+        WHERE folderID = ? AND plantName = ?
+        """
+        db.execute(sql, [change, folderID, plantName])
+    else:
+        sql = """
+        DELETE FROM folder 
+        WHERE folderID = ? AND plantName = ?
+        """
+        db.execute(sql, [folderID, plantName])
+    
 def get_folders(userID):
     folder_rows = db.query("SELECT * FROM folders WHERE userID = ?", [userID])
     sql_count = "SELECT quantity FROM folder WHERE folderID = ?"
@@ -261,3 +298,16 @@ def get_folders(userID):
             count += q[0]
         folders[folderName] = count
     return folders
+
+def delete_folder(userID, name):
+    target_folder = db.query("SELECT * FROM folders WHERE userID = ? AND folderName = ?", [userID, name])
+    for i in get_folder_plants(userID, name):
+        unfolder(userID, name, i["plantName"], i["quantity"])
+    sql = "DELETE FROM folders WHERE userID = ? AND folderName = ? AND folderID = ?"
+    db.execute(sql, [userID, name, target_folder[0]["folderID"]])
+
+def rename_folder(userID, name, newName):
+    target_folder = db.query("SELECT * FROM folders WHERE userID = ? AND folderName = ?", [userID, name])
+    rename = """UPDATE folders SET folderName = ? WHERE folderID = ? AND userID = ?"""
+    db.execute(rename, [newName, target_folder[0]["folderID"], userID])
+

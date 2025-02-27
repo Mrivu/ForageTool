@@ -35,8 +35,6 @@ def login(username, password):
         
 def register_user(username, password1, password2, bonus, multiplier, isAdmin):
     isAdmin = 0 if isAdmin == "no" else 1
-    if username == "" or password1 == "":
-        return render_template("register.html", message = "The password and the username can't be empty")
     if password1 != password2:
         return render_template("register.html", message = "The passwords don't match")
     password_hash = generate_password_hash(password1)

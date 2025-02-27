@@ -28,7 +28,7 @@ def user():
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html", message = "")
+        return render_template("register.html", message="")
     if request.method == "POST":
         username = request.form["username"]
         password1 = request.form["password1"]
@@ -36,7 +36,11 @@ def register():
         bonus = int(request.form["bonus"])
         multiplier = int(request.form["multiplier"])
         isAdmin = request.form.get("admin", "no")
-        users.register_user(username, password1, password2, bonus, multiplier, isAdmin)
+        print(password1, password2)
+        
+        result = users.register_user(username, password1, password2, bonus, multiplier, isAdmin)
+        if result is not None:
+            return result
         return redirect("/")
     
 @app.route("/logout")
@@ -60,8 +64,8 @@ def catalogue():
 @app.route("/inventory", methods = ["GET", "POST"])
 def inventory():
     users.require_login()
-    move_location = None
-    if session["moveLocation"] in commands.get_folders(session["userID"]):
+    move_location = session.get("moveLocation")
+    if move_location and move_location in commands.get_folders(session["userID"]):
         move_location = session["moveLocation"]
     if request.method == "GET":
         inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
@@ -94,7 +98,15 @@ def move_plant(name):
         commands.move_plant_to_folder(session["userID"], folderName, name)
     return redirect("/inventory")
 
-@app.route("/inventory/<string:name>", methods = ["GET"])
+@app.route("/unfolder/<string:folder>/<string:name>", methods = ["POST"])
+def unfolder(folder, name):
+    users.require_login()
+    if request.method == "POST":
+        folderName = folder
+        commands.unfolder(session["userID"], folderName, name)
+    return redirect("/inventory/"+folderName)
+
+@app.route("/inventory/<string:name>", methods = ["GET", "POST"])
 def display_folder(name):
     users.require_login()
     if request.method == "GET":
@@ -122,13 +134,13 @@ def forage():
         region = request.form["regions"]
         diceroll = random.randint(1,20)
         total = diceroll+session["forageBonus"]+extraBonus
-        if diceroll == 20: ## Check nat 20
-            plantAmount += 1
         if (total > 40):
             total = 40
         elif (total < 1):
             total = 1
         plantAmount = math.floor(total / 10)+availability
+        if diceroll == 20: ## Check nat 20
+            plantAmount += 1
         plantAmount = (plantAmount) * int(session["forageMultiplier"])
         weights = [rarity.rollResults[total-1]["Common"],
            rarity.rollResults[total-1]["Uncommon"],
@@ -250,3 +262,18 @@ def delete_plant(name):
             return redirect("/catalogue")
         elif action == "no":
             return redirect("/catalogue")
+        
+@app.route("/deleteFolder/<string:name>", methods = ["POST"])
+def delete_folder(name):
+    users.require_login()
+    if request.method == "POST":
+        commands.delete_folder(session["userID"], name)
+        return redirect("/inventory")
+    
+@app.route("/renameFolder/<string:name>", methods = ["POST"])
+def rename_folder(name):
+    users.require_login()
+    if request.method == "POST":
+        newName = request.form["newName"]
+        commands.rename_folder(session["userID"], name, newName)
+        return redirect("/inventory")

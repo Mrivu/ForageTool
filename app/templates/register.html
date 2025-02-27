@@ -9,23 +9,23 @@
   <form action="/register" method="POST">
     <p>
       Username: <br />
-      <input type="text" name="username" />
+      <input type="text" name="username" minlength="3" required/>
     </p>
     <p>
       Password: <br />
-      <input type="password" name="password1" />
+      <input type="password" name="password1" minlength="3" required/>
     </p>
     <p>
       Re-enter Password: <br />
-      <input type="password" name="password2" />
+      <input type="password" name="password2" minlength="3" required/>
     </p>
     <p>
-      Enter Forage bonus <br />
-      <input type="text" name="bonus" />
+      Enter Survival modifier <br />
+      <input type="number" name="bonus" value="0" min="-20" max="40" required />
     </p>
     <p>
       Enter forage Multiplier <br />
-      <input type="text" name="multiplier" />
+      <input type="number" name="multiplier" value="1" min="1" max="10" required />
     </p>
     <label>
       <input type="checkbox" name="admin" value="yes"> Admin user?
