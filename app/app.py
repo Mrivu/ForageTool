@@ -51,15 +51,15 @@ def logout():
 def catalogue():
     users.require_login()
     if request.method == "GET":
-        Plants = commands.get_plants_by(session["keyword"], session["selected_filter"])
-        return render_template("catalogue.html", message = "", plants=Plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
+        plants = commands.get_plants_by(session["keyword"], session["selected_filter"])
+        return render_template("catalogue.html", message = "", plants=plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
     if request.method == "POST":
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
-        Plants = commands.get_plants_by(keyword, selected_filter)
+        plants = commands.get_plants_by(keyword, selected_filter)
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
-        return render_template("catalogue.html", message = "", plants=Plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
+        return render_template("catalogue.html", message = "", plants=plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
 
 @app.route("/inventory", methods = ["GET", "POST"])
 def inventory():

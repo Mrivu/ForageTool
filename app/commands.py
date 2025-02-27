@@ -15,23 +15,24 @@ def get_plant(name):
     sql = """
     SELECT 
         p.plantName,
-        p.rarity,
+        ra.rarity,
         p.rarityID,
         p.plantDescription,
         GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
-        GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
+        GROUP_CONCAT(DISTINCT reg.regionName) AS plantRegions,
         (SELECT GROUP_CONCAT(effectName) 
-        FROM effect 
-        WHERE plantName = p.plantName) AS plantEffects
+         FROM effect 
+         WHERE plantName = p.plantName) AS plantEffects
     FROM plants p
-    JOIN area    pa ON p.plantName = pa.plantName
-    JOIN areas   a  ON pa.areaName = a.areaName
-    JOIN region  pr ON p.plantName = pr.plantName
-    JOIN regions r  ON pr.regionName = r.regionName
-    JOIN effect  pe ON p.plantName = pe.plantName
-    JOIN effects e  ON pe.effectName = e.effectName
+    JOIN rarity ra ON p.rarityID = ra.rarityID
+    JOIN area pa ON p.plantName = pa.plantName
+    JOIN areas a ON pa.areaName = a.areaName
+    JOIN region pr ON p.plantName = pr.plantName
+    JOIN regions reg ON pr.regionName = reg.regionName
+    JOIN effect pe ON p.plantName = pe.plantName
+    JOIN effects e ON pe.effectName = e.effectName
     WHERE p.plantName = ?
-    GROUP BY p.plantName, p.rarity, p.plantDescription
+    GROUP BY p.plantName, ra.rarity, p.plantDescription
     """
     plant = db.query(sql, [name])
     if plant:
@@ -42,7 +43,7 @@ def get_inventory(id, keyword, filter):
     sql = f"""
     SELECT 
         p.plantName,
-        p.rarity,
+        ra.rarity,
         p.rarityID,
         p.plantDescription,
         GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
@@ -51,6 +52,7 @@ def get_inventory(id, keyword, filter):
         i.quantity
     FROM inventory i
     JOIN plants p ON i.plantName = p.plantName
+    JOIN rarity ra ON p.rarityID = ra.rarityID
     LEFT JOIN area pa ON p.plantName = pa.plantName
     LEFT JOIN areas a ON pa.areaName = a.areaName
     LEFT JOIN region pr ON p.plantName = pr.plantName
@@ -59,7 +61,7 @@ def get_inventory(id, keyword, filter):
     LEFT JOIN effects e ON pe.effectName = e.effectName
     WHERE i.userID = ?
     AND {filterReference[filter]} LIKE ?
-    GROUP BY p.plantName, p.rarity, p.rarityID, p.plantDescription, i.quantity
+    GROUP BY p.plantName, ra.rarity, p.rarityID, p.plantDescription, i.quantity
     ORDER BY {filterReference[filter]}
     """
 
@@ -68,7 +70,7 @@ def get_inventory(id, keyword, filter):
         sql = f"""
         SELECT 
             p.plantName,
-            p.rarity,
+            ra.rarity,
             p.rarityID,
             p.plantDescription,
             GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
@@ -77,6 +79,7 @@ def get_inventory(id, keyword, filter):
             i.quantity
         FROM inventory i
         JOIN plants p ON i.plantName = p.plantName
+        JOIN rarity ra ON p.rarityID = ra.rarityID
         LEFT JOIN area pa ON p.plantName = pa.plantName
         LEFT JOIN areas a ON pa.areaName = a.areaName
         LEFT JOIN region pr ON p.plantName = pr.plantName
@@ -84,68 +87,77 @@ def get_inventory(id, keyword, filter):
         LEFT JOIN effect pe ON p.plantName = pe.plantName
         LEFT JOIN effects e ON pe.effectName = e.effectName
         WHERE i.userID = ?
-        GROUP BY p.plantName, p.rarity, p.rarityID, p.plantDescription, i.quantity
+        GROUP BY p.plantName, ra.rarity, p.rarityID, p.plantDescription, i.quantity
         ORDER BY {filterReference[filter]}
         """
         return db.query(sql, [id])
 
     return result
 
-
 def get_plants_by(keyword, filter):
-    sql = f"""SELECT 
+    if filter == "Rarity":
+        whereClause = "ra.rarity LIKE ?"
+        orderClause = "p.rarityID"
+    else:
+        whereClause = f"{filterReference[filter]} LIKE ?"
+        orderClause = f"{filterReference[filter]}"
+    
+    base_sql = f"""SELECT 
                 p.plantName,
-                p.rarity,
+                ra.rarity,
                 p.rarityID,
                 p.plantDescription,
                 GROUP_CONCAT(DISTINCT a.areaName)   AS plantAreas,
                 GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
                 GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects
             FROM plants p
+            JOIN rarity ra ON p.rarityID = ra.rarityID
             JOIN area pa ON p.plantName = pa.plantName
             JOIN areas a ON pa.areaName = a.areaName
             JOIN region pr ON p.plantName = pr.plantName
             JOIN regions r ON pr.regionName = r.regionName
             JOIN effect pe ON p.plantName = pe.plantName
             JOIN effects e ON pe.effectName = e.effectName
-            WHERE {filterReference[filter]} LIKE ?
-            GROUP BY p.plantName, p.rarity, p.plantDescription
-            ORDER BY {filterReference[filter]}
     """
-    result = db.query(sql, ["%"+keyword+"%"])
-    if keyword == "":
-        sql = f"""SELECT 
-            p.plantName,
-            p.rarity,
-            p.rarityID,
-            p.plantDescription,
-            GROUP_CONCAT(DISTINCT a.areaName)   AS plantAreas,
-            GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
-            GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects
-            FROM plants p
-            JOIN area pa ON p.plantName = pa.plantName
-            JOIN areas a ON pa.areaName = a.areaName
-            JOIN region pr ON p.plantName = pr.plantName
-            JOIN regions r ON pr.regionName = r.regionName
-            JOIN effect pe ON p.plantName = pe.plantName
-            JOIN effects e ON pe.effectName = e.effectName
-            GROUP BY p.plantName, p.rarity, p.plantDescription
-            ORDER BY {filterReference[filter]}
+    
+    if keyword:
+        sql = f"""{base_sql}
+            WHERE {whereClause}
+            GROUP BY p.plantName, ra.rarity, p.plantDescription
+            ORDER BY {orderClause}
         """
-        return db.query(sql)
+        result = db.query(sql, ["%" + keyword + "%"])
+    else:
+        sql = f"""{base_sql}
+            GROUP BY p.plantName, ra.rarity, p.plantDescription
+            ORDER BY {orderClause}
+        """
+        result = db.query(sql)
     return result
+
+def get_rarity(plantName=None):
+    if plantName is None:
+        # Return all rarities from the rarity table.
+        return [row[0] for row in db.query("SELECT rarity FROM rarity")]
+    else:
+        rarityID = db.query("SELECT rarityID FROM plants WHERE plantName = ?", [plantName])
+        return db.query("SELECT rarity FROM rarity WHERE rarityID = ?", [rarityID])  ## ["rarity"], ["rartyID"]
 
 def override_plant(plant, oldName):
     plantUpdate = """
     UPDATE plants
-    SET plantName = ?, rarity = ?, rarityID = ?, plantDescription = ?
+    SET plantName = ?, rarityID = ?, plantDescription = ?
     WHERE plantName = ?
     """
+
+    rarityID = -1
+    if plant["rarity"] in get_rarity():
+        rarityID = db.query("SELECT rarityID FROM rarity WHERE rarity = ?", [plant["rarity"]])[0][0]
 
     db.execute("DELETE FROM area WHERE plantName = ?", [oldName])
     db.execute("DELETE FROM region WHERE plantName = ?", [oldName])
     db.execute("DELETE FROM effect WHERE plantName = ?", [oldName])
-    db.execute(plantUpdate, [plant["name"], plant["rarity"], rarity.check_rarity(plant["rarity"]), plant["Description"], oldName]) 
+    db.execute(plantUpdate, [plant["name"], rarityID, plant["Description"], oldName]) 
 
     for a in plant["Area"]:
         db.execute("INSERT OR IGNORE INTO area (plantName, areaName) VALUES (?, ?)", [plant["name"], a])
@@ -161,8 +173,13 @@ def override_plant(plant, oldName):
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], e, value])
 
 def insert_plant(plant):
-    plantInsert = "INSERT INTO plants (plantName, rarity, rarityID, plantDescription) VALUES (?,?,?,?)"
-    db.execute(plantInsert, [plant["name"], plant["rarity"], rarity.check_rarity(plant["rarity"]), plant["Description"]])
+    plantInsert = "INSERT INTO plants (plantName, rarityID, plantDescription) VALUES (?,?,?)"
+
+    rarityID = -1
+    if plant["rarity"] in get_rarity():
+        rarityID = db.query("SELECT rarityID FROM rarity WHERE rarity = ?", [plant["rarity"]])[0][0]
+
+    db.execute(plantInsert, [plant["name"], rarityID, plant["Description"]])
 
     for i in plant["Area"]:
         sql = "INSERT OR IGNORE INTO areas (areaName) VALUES (?)"

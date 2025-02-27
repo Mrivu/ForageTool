@@ -42,9 +42,13 @@ CREATE TABLE folder (
 
 CREATE TABLE plants (
     plantName TEXT PRIMARY KEY,
-    rarity TEXT,
-    rarityID INTEGER,
-    plantDescription TEXT
+    plantDescription TEXT,
+    rarityID INTEGER
+);
+
+CREATE TABLE rarity (
+    rarityID INTEGER PRIMARY KEY,
+    rarity TEXT
 );
 
 CREATE TABLE areas (
