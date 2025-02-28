@@ -10,7 +10,12 @@
             <h1>{{ plant.plantName }}</h1>
             <input type="text" name="Name" value="{{ plant.plantName }}" minlength="3" required>
             <h2>{{ plant.rarity }} plant</h2>
-            <input type="text" name="Rarity" value="{{ plant.rarity }}" minlength="1" required>
+            <label for="Rarity">Rarity:</label>
+            <select name="Rarity" id="Rarity">
+                {% for r in rarity %}
+                    <option value={{r}} {% if plant.rarity == r %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+            </select>
             <h2>Found in {{ plant.plantAreas.replace(",", ", ") }} in {{ plant.plantRegions.replace(",", ", ") }}</h2>
             <input type="text" name="Area" value="{{ plant.plantAreas }}" minlength="2" required>
             <input type="text" name="Region" value="{{ plant.plantRegions }}" minlength="2" required>

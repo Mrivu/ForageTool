@@ -5,7 +5,7 @@
     </head>
 
     <body>
-        <form action="/inventory/{{ name }}" method = "POST">
+        <form action="/inventory/{{ name }}/{{ page }}" method = "POST">
             <label for="filters">Search in:</label>
             <select name="filter" id="filters">
                 <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
@@ -30,7 +30,7 @@
             <input type="text" name="newName" minlength="1" required/>
             <button type="submit">Rename Folder</button>
         </form>
-        <a href="/inventory">Go back</a>
+        <a href="/inventory/1">Go back</a>
         {% for plant in folder %}
         <p>
             <a href="/plants/{{ plant.plantName }}?source={{ 'inventory/' ~ name }}">{{ plant.plantName }} - {{ plant.quantity }}</a>
@@ -39,5 +39,14 @@
             </form>
         </p>
         {% endfor %}
+        <p>
+            {% if page > 1 %}
+                <a href="/{{ name }}/{{ page - 1 }}">&lt;&lt;</a>
+            {% endif %}
+            Page {{ page }}/{{ page_count }}
+            {% if page < page_count %}
+                <a href="/inventory/{{ name }}/{{ page + 1 }}">&gt;&gt;</a>
+            {% endif %}
+        </p>
     </body>
 </html>

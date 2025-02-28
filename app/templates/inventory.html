@@ -5,7 +5,7 @@
     </head>
 
     <body>
-        <form action="/inventory" method = "POST">
+        <form action="/inventory/{{ page }}" method = "POST">
             <label for="filters">Sort by:</label>
             <select name="filter" id="filters">
                 <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
@@ -31,7 +31,7 @@
         </form>
         {% for folderName, count in folders.items() %}
         <p>
-            <a href="/inventory/{{ folderName }}">{{ folderName }} - {{ count }}</a>
+            <a href="/inventory/{{ folderName }}/1">{{ folderName }} - {{ count }}</a>
         </p>
         {% endfor %}
         {% for plant in inventory %}
@@ -50,5 +50,15 @@
             {% endif %}
         </p>
         {% endfor %}
+        <p>
+            {% if page > 1 %}
+                <a href="/inventory/{{ page - 1 }}">&lt;&lt;</a>
+            {% endif %}
+            Page {{ page }}/{{ page_count }}
+            {% if page < page_count %}
+                <a href="/inventory/{{ page + 1 }}">&gt;&gt;</a>
+            {% endif %}
+        </p>
+        <hr />
     </body>
 </html>

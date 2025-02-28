@@ -39,8 +39,8 @@ def get_plant(name):
         return plant[0]
     return None
 
-def get_inventory(id, keyword, filter):
-    sql = f"""
+def get_inventory(user_id, keyword, filter, pageNum=None):
+    base_sql = """
     SELECT 
         p.plantName,
         ra.rarity,
@@ -60,39 +60,25 @@ def get_inventory(id, keyword, filter):
     LEFT JOIN effect pe ON p.plantName = pe.plantName
     LEFT JOIN effects e ON pe.effectName = e.effectName
     WHERE i.userID = ?
-    AND {filterReference[filter]} LIKE ?
+    """
+    
+    arguments = [user_id]
+    if keyword:
+        base_sql += f" AND {filterReference[filter]} LIKE ?"
+        arguments.append("%" + keyword + "%")
+    
+    
+    base_sql += f"""
     GROUP BY p.plantName, ra.rarity, p.rarityID, p.plantDescription, i.quantity
     ORDER BY {filterReference[filter]}
     """
-
-    result = db.query(sql, [id, "%" + keyword + "%"])
-    if keyword == "":
-        sql = f"""
-        SELECT 
-            p.plantName,
-            ra.rarity,
-            p.rarityID,
-            p.plantDescription,
-            GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
-            GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
-            GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects,
-            i.quantity
-        FROM inventory i
-        JOIN plants p ON i.plantName = p.plantName
-        JOIN rarity ra ON p.rarityID = ra.rarityID
-        LEFT JOIN area pa ON p.plantName = pa.plantName
-        LEFT JOIN areas a ON pa.areaName = a.areaName
-        LEFT JOIN region pr ON p.plantName = pr.plantName
-        LEFT JOIN regions r ON pr.regionName = r.regionName
-        LEFT JOIN effect pe ON p.plantName = pe.plantName
-        LEFT JOIN effects e ON pe.effectName = e.effectName
-        WHERE i.userID = ?
-        GROUP BY p.plantName, ra.rarity, p.rarityID, p.plantDescription, i.quantity
-        ORDER BY {filterReference[filter]}
-        """
-        return db.query(sql, [id])
-
-    return result
+    if pageNum:
+        limit = 10
+        offset = 10 * (pageNum - 1)
+        base_sql += "LIMIT ? OFFSET ?"
+        arguments.append(limit)
+        arguments.append(offset)
+    return db.query(base_sql, arguments)
 
 def get_plants_by(keyword="", filter="Name", pageNum=None):
     if filter == "Rarity":
@@ -128,8 +114,8 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
             ORDER BY {orderClause}
         """
         if pageNum:
-            limit = 2
-            offset = 2 * (pageNum - 1)
+            limit = 10
+            offset = 10 * (pageNum - 1)
             sql += "LIMIT ? OFFSET ?"
             arguments.append(limit)
             arguments.append(offset)
@@ -140,8 +126,8 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
             ORDER BY {orderClause}
         """
         if pageNum:
-            limit = 2
-            offset = 2 * (pageNum - 1)
+            limit = 10
+            offset = 10 * (pageNum - 1)
             sql += "LIMIT ? OFFSET ?"
             arguments.append(limit)
             arguments.append(offset)
@@ -150,11 +136,10 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
 
 def get_rarity(plantName=None):
     if plantName is None:
-        # Return all rarities from the rarity table.
-        return [row[0] for row in db.query("SELECT rarity FROM rarity")]
+        return [row[0] for row in db.query("SELECT rarity FROM rarity")] ## ["rarity"], ["rartyID"]
     else:
         rarityID = db.query("SELECT rarityID FROM plants WHERE plantName = ?", [plantName])
-        return db.query("SELECT rarity FROM rarity WHERE rarityID = ?", [rarityID])  ## ["rarity"], ["rartyID"]
+        return db.query("SELECT rarity FROM rarity WHERE rarityID = ?", [rarityID])
 
 def override_plant(plant, oldName):
     plantUpdate = """
@@ -232,15 +217,54 @@ def new_folder(id, name):
     """
     db.execute(sql, [id, name])
 
-def get_folder_plants(userID, folderName):
-    folderID = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])[0][0]
-    sql = """
-    SELECT p.plantName, fp.quantity
+def get_folder_plants(userID, folderName, keyword="", filter="Name", pageNum=None):
+    folder_rows = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])
+    folderID = folder_rows[0][0]
+    
+    base_sql = """
+    SELECT 
+        p.plantName, 
+        fp.quantity,
+        ra.rarity,
+        p.rarityID,
+        p.plantDescription,
+        GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
+        GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
+        GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects
     FROM folder fp
     JOIN plants p ON fp.plantName = p.plantName
+    JOIN rarity ra ON p.rarityID = ra.rarityID
+    LEFT JOIN area pa ON p.plantName = pa.plantName
+    LEFT JOIN areas a ON pa.areaName = a.areaName
+    LEFT JOIN region pr ON p.plantName = pr.plantName
+    LEFT JOIN regions r ON pr.regionName = r.regionName
+    LEFT JOIN effect pe ON p.plantName = pe.plantName
+    LEFT JOIN effects e ON pe.effectName = e.effectName
     WHERE fp.folderID = ?
     """
-    return db.query(sql, [folderID])
+    
+    arguments = [folderID]
+    if keyword:
+        if filter == "Rarity":
+            whereClause = "ra.rarity LIKE ?"
+        else:
+            whereClause = f"{filterReference[filter]} LIKE ?"
+        base_sql += " AND " + whereClause
+        arguments.append("%" + keyword + "%")
+    
+    base_sql += """
+    GROUP BY p.plantName, ra.rarity, p.rarityID, p.plantDescription, fp.quantity
+    """
+    base_sql += f" ORDER BY {filterReference[filter]}"
+    
+    if pageNum:
+        limit = 10
+        offset = 10 * (pageNum - 1)
+        base_sql += " LIMIT ? OFFSET ?"
+        arguments.append(limit)
+        arguments.append(offset)
+
+    return db.query(base_sql, arguments)
 
 def move_plant_to_folder(userID, folderName, plantName, change=1):
     folder_rows = db.query("SELECT folderID FROM folders WHERE userID = ? AND folderName = ?", [userID, folderName])

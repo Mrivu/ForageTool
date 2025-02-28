@@ -50,7 +50,6 @@ def logout():
 @app.route("/catalogue/<int:page_num>", methods=["GET", "POST"])
 def catalogue(page_num=1):
     users.require_login()
-    print("Catalogue")
     if request.method == "POST":
         session["keyword"] = request.form.get("keyword", "")
         session["selected_filter"] = request.form.get("filter", "Name")
@@ -59,38 +58,36 @@ def catalogue(page_num=1):
     selected_filter = session.get("selected_filter", "Name")
 
     plants = commands.get_plants_by(keyword, selected_filter)
-    page_count = max(math.ceil(len(plants ) / 2), 1)
+    page_count = max(math.ceil(len(plants) / 10), 1)
     plants = commands.get_plants_by(keyword, selected_filter, page_num)
 
     if page_num < 1:
         return redirect("/catalogue/1")
     if page_num > page_count:
-        return redirect("/" + str(page_count))
+        return redirect("/catalogue/" + str(page_count))
     
     return render_template("catalogue.html", message="", page=page_num, page_count=page_count, plants=plants, keyword=keyword, selected_filter=selected_filter)
 
-@app.route("/change_page/<string:location>/<int:page_num>", methods=["GET", "POST"])
-def change_page(location, page_num):
-    session["page"] = page_num
-    return redirect(f"/{location}/{page_num}")
-
-@app.route("/inventory", methods = ["GET", "POST"])
-def inventory():
+@app.route("/inventory/<int:page_num>", methods = ["GET", "POST"])
+def inventory(page_num=1):
     users.require_login()
     folders = commands.get_folders(session["userID"])
     move_location = session.get("moveLocation")
     if move_location and move_location in commands.get_folders(session["userID"]):
         move_location = session["moveLocation"]
-    if request.method == "GET":
-        inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
-        return render_template("inventory.html", move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     if request.method == "POST":
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
-        inventory = commands.get_inventory(session["userID"], keyword, selected_filter)
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
-        return render_template("inventory.html", move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
+    inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
+    page_count = max(math.ceil(len(inventory) / 10), 1)
+    inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"], page_num)
+    if page_num < 1:
+        return redirect("/inventoy/1")
+    if page_num > page_count:
+        return redirect("/inventory/" + str(page_count))
+    return render_template("inventory.html", page=page_num, page_count=page_count, move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     
 @app.route("/newFolder", methods = ["POST"])
 def newFolder():
@@ -99,7 +96,7 @@ def newFolder():
         folderName = request.form["newFolder"]
         print(session["userID"])
         commands.new_folder(session["userID"], folderName)
-    return redirect("/inventory")
+    return redirect("/inventory/1")
 
 @app.route("/movePlant/<string:name>", methods = ["POST"])
 def move_plant(name):
@@ -108,7 +105,7 @@ def move_plant(name):
         folderName = request.form["folder"]
         session["moveLocation"] = folderName
         commands.move_plant_to_folder(session["userID"], folderName, name)
-    return redirect("/inventory")
+    return redirect("/inventory/1")
 
 @app.route("/unfolder/<string:folder>/<string:name>", methods = ["POST"])
 def unfolder(folder, name):
@@ -116,20 +113,24 @@ def unfolder(folder, name):
     if request.method == "POST":
         folderName = folder
         commands.unfolder(session["userID"], folderName, name)
-    return redirect("/inventory/"+folderName)
+    return redirect("/inventory/"+folderName+"/1")
 
-@app.route("/inventory/<string:name>", methods = ["GET", "POST"])
-def display_folder(name):
+@app.route("/inventory/<string:name>/<int:page_num>", methods = ["GET", "POST"])
+def display_folder(name, page_num=1):
     users.require_login()
-    folder = commands.get_folder_plants(session["userID"], name)
-    if request.method == "GET":
-        return render_template("folder.html", message = "", name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
     if request.method == "POST":
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
         session["keyword"] = keyword
         session["selected_filter"] = selected_filter
-        return render_template("folder.html", message = "", name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
+    folder = commands.get_folder_plants(session["userID"], name, session["keyword"], session["selected_filter"])
+    page_count = max(math.ceil(len(folder) / 10), 1)
+    folder = commands.get_folder_plants(session["userID"], name, session["keyword"], session["selected_filter"], page_num)
+    if page_num < 1:
+        return redirect("/inventoy/" + name)
+    if page_num > page_count:
+        return redirect("/inventory/" + name + "/" + str(page_count))
+    return render_template("folder.html", message = "", page=page_num, page_count=page_count, name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
 
 @app.route("/forage", methods = ["GET", "POST"])
 def forage():
@@ -248,7 +249,8 @@ def edit_plant(name):
     users.require_admin()
     if request.method == "GET":
         plant = commands.get_plant(name)
-        return render_template("edit.html", plant=plant, message="")
+        rarity = commands.get_rarity()
+        return render_template("edit.html", rarity=rarity, plant=plant, message="")
     if request.method == "POST":
         plant = {}
         plant["name"] = request.form.get("Name")
@@ -280,7 +282,7 @@ def delete_folder(name):
     users.require_login()
     if request.method == "POST":
         commands.delete_folder(session["userID"], name)
-        return redirect("/inventory")
+        return redirect("/inventory/1")
     
 @app.route("/renameFolder/<string:name>", methods = ["POST"])
 def rename_folder(name):
@@ -288,4 +290,4 @@ def rename_folder(name):
     if request.method == "POST":
         newName = request.form["newName"]
         commands.rename_folder(session["userID"], name, newName)
-        return redirect("/inventory")
+        return redirect("/inventory/1")
