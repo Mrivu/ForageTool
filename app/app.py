@@ -47,32 +47,44 @@ def register():
 def logout():
     return users.logout()
 
-@app.route("/catalogue", methods = ["GET", "POST"])
-def catalogue():
+@app.route("/catalogue/<int:page_num>", methods=["GET", "POST"])
+def catalogue(page_num=1):
     users.require_login()
-    if request.method == "GET":
-        plants = commands.get_plants_by(session["keyword"], session["selected_filter"])
-        return render_template("catalogue.html", message = "", plants=plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
+    print("Catalogue")
     if request.method == "POST":
-        selected_filter = request.form["filter"]
-        keyword = request.form["keyword"]
-        plants = commands.get_plants_by(keyword, selected_filter)
-        session["keyword"] = keyword
-        session["selected_filter"] = selected_filter
-        return render_template("catalogue.html", message = "", plants=plants, keyword=session["keyword"], selected_filter=session["selected_filter"])
+        session["keyword"] = request.form.get("keyword", "")
+        session["selected_filter"] = request.form.get("filter", "Name")
+
+    keyword = session.get("keyword", "")
+    selected_filter = session.get("selected_filter", "Name")
+
+    plants = commands.get_plants_by(keyword, selected_filter)
+    page_count = max(math.ceil(len(plants ) / 2), 1)
+    plants = commands.get_plants_by(keyword, selected_filter, page_num)
+
+    if page_num < 1:
+        return redirect("/catalogue/1")
+    if page_num > page_count:
+        return redirect("/" + str(page_count))
+    
+    return render_template("catalogue.html", message="", page=page_num, page_count=page_count, plants=plants, keyword=keyword, selected_filter=selected_filter)
+
+@app.route("/change_page/<string:location>/<int:page_num>", methods=["GET", "POST"])
+def change_page(location, page_num):
+    session["page"] = page_num
+    return redirect(f"/{location}/{page_num}")
 
 @app.route("/inventory", methods = ["GET", "POST"])
 def inventory():
     users.require_login()
+    folders = commands.get_folders(session["userID"])
     move_location = session.get("moveLocation")
     if move_location and move_location in commands.get_folders(session["userID"]):
         move_location = session["moveLocation"]
     if request.method == "GET":
         inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"])
-        folders = commands.get_folders(session["userID"])
         return render_template("inventory.html", move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     if request.method == "POST":
-        folders = commands.get_folders(session["userID"])
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
         inventory = commands.get_inventory(session["userID"], keyword, selected_filter)
@@ -109,11 +121,10 @@ def unfolder(folder, name):
 @app.route("/inventory/<string:name>", methods = ["GET", "POST"])
 def display_folder(name):
     users.require_login()
+    folder = commands.get_folder_plants(session["userID"], name)
     if request.method == "GET":
-        folder = commands.get_folder_plants(session["userID"], name)
         return render_template("folder.html", message = "", name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
     if request.method == "POST":
-        folder = commands.get_folder_plants(session["userID"], name)
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
         session["keyword"] = keyword
@@ -123,11 +134,13 @@ def display_folder(name):
 @app.route("/forage", methods = ["GET", "POST"])
 def forage():
     users.require_login()
+    areas = db.query("SELECT * FROM areas")
+    regions = db.query("SELECT * FROM regions")
     if request.method == "GET":
-       areas = db.query("SELECT * FROM areas")
-       regions = db.query("SELECT * FROM regions")
        return render_template("forage.html", message="", areas=areas, regions=regions)
     if request.method == "POST":
+        if not commands.get_plants_by():
+            return render_template("forage.html", message="No plants imported", areas=areas, regions=regions)
         extraBonus = int(request.form.get("extraBonus") or 0)
         availability = int(request.form.get("plantAvailability") or 0)
         area = request.form["areas"]
@@ -191,13 +204,11 @@ def import_plants():
 @app.route("/profile", methods = ["GET", "POST"])
 def profile():
     users.require_login()
+    statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
+    user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
     if request.method == "GET":
-        statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
-        user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
         return render_template("profile.html", message = "", user=user, statistics=statistics)
     if request.method == "POST":
-        statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
-        user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
         username = request.form["username"]
         bonus = int(request.form["bonus"])
         multiplier = int(request.form["multiplier"])
@@ -228,7 +239,8 @@ def view_plant(name):
     users.require_login()
     plant = commands.get_plant(name)
     source = request.args.get("source", "catalogue")
-    return render_template("plant.html", plant=plant, source=source)
+    page = request.args.get("page", 1)
+    return render_template("plant.html", page=page, plant=plant, source=source)
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
 def edit_plant(name):
@@ -246,7 +258,7 @@ def edit_plant(name):
         plant["Effects"] = request.form.get("Effects").split(",")
         plant["Description"] = request.form.get("Description")
         commands.override_plant(plant, name)
-        return redirect("/catalogue")
+        return redirect(f"/catalogue/1")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
 def delete_plant(name):
@@ -259,9 +271,9 @@ def delete_plant(name):
         action = request.form.get("button")
         if action == "yes":
             commands.delete_plant(name)
-            return redirect("/catalogue")
+            return redirect(f"/catalogue/1")
         elif action == "no":
-            return redirect("/catalogue")
+            return redirect(f"/catalogue/1")
         
 @app.route("/deleteFolder/<string:name>", methods = ["POST"])
 def delete_folder(name):

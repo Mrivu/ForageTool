@@ -94,7 +94,7 @@ def get_inventory(id, keyword, filter):
 
     return result
 
-def get_plants_by(keyword, filter):
+def get_plants_by(keyword="", filter="Name", pageNum=None):
     if filter == "Rarity":
         whereClause = "ra.rarity LIKE ?"
         orderClause = "p.rarityID"
@@ -117,22 +117,35 @@ def get_plants_by(keyword, filter):
             JOIN region pr ON p.plantName = pr.plantName
             JOIN regions r ON pr.regionName = r.regionName
             JOIN effect pe ON p.plantName = pe.plantName
-            JOIN effects e ON pe.effectName = e.effectName
-    """
+            JOIN effects e ON pe.effectName = e.effectName """
     
+    arguments = []
     if keyword:
+        arguments.append("%" + keyword + "%")
         sql = f"""{base_sql}
             WHERE {whereClause}
             GROUP BY p.plantName, ra.rarity, p.plantDescription
             ORDER BY {orderClause}
         """
-        result = db.query(sql, ["%" + keyword + "%"])
+        if pageNum:
+            limit = 2
+            offset = 2 * (pageNum - 1)
+            sql += "LIMIT ? OFFSET ?"
+            arguments.append(limit)
+            arguments.append(offset)
+        result = db.query(sql, arguments)
     else:
         sql = f"""{base_sql}
             GROUP BY p.plantName, ra.rarity, p.plantDescription
             ORDER BY {orderClause}
         """
-        result = db.query(sql)
+        if pageNum:
+            limit = 2
+            offset = 2 * (pageNum - 1)
+            sql += "LIMIT ? OFFSET ?"
+            arguments.append(limit)
+            arguments.append(offset)
+        result = db.query(sql, arguments)
     return result
 
 def get_rarity(plantName=None):

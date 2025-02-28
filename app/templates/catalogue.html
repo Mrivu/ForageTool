@@ -5,7 +5,7 @@
     </head>
 
     <body>
-        <form action="/catalogue" method = "POST">
+        <form action="/catalogue/{{ page }}" method = "POST">
             <label for="filters">Sort by:</label>
             <select name="filter" id="filters">
                 <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
@@ -26,16 +26,26 @@
         <a href="/">Go back</a>
         {% for plant in plants %}
         <p>
-            <a href="/plants/{{ plant.plantName }}?source=catalogue">{{ plant.plantName }}</a>
+            <a href="/plants/{{ plant.plantName }}?source=catalogue&page={{ page }}">{{ plant.plantName }}</a>
             {% if session.isAdmin %}
-            <form action="edit/{{ plant.plantName }}">
+            <form action="/edit/{{ plant.plantName }}"">
                 <button type="submit">Edit</button>
             </form>
-            <form action="delete/{{ plant.plantName }}">
+            <form action="/delete/{{ plant.plantName }}">
                 <button type="submit">Delete</button>
             </form>
             {% endif %}
         </p>
         {% endfor %}
+        <p>
+            {% if page > 1 %}
+                <a href="/change_page/catalogue/{{ page - 1 }}">&lt;&lt;</a>
+            {% endif %}
+            Sivu {{ page }}/{{ page_count }}
+            {% if page < page_count %}
+                <a href="/change_page/catalogue/{{ page + 1 }}">&gt;&gt;</a>
+            {% endif %}
+        </p>
+        <hr />
     </body>
 </html>
