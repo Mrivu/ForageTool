@@ -271,7 +271,7 @@ def move_plant_to_folder(userID, folderName, plantName, change=1):
     if not folder_rows:
         raise ValueError(f"Folder '{folderName}' not found for user {userID}")
     folderID = folder_rows[0][0]
-    folder_contents = db.query("SELECT * FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])
+    folder_contents = db.query("SELECT folderID, folderName FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])
 
     if folder_contents:
         sql =  """
@@ -340,7 +340,7 @@ def unfolder(userID, folderName, plantName, change=1):
         db.execute(sql, [folderID, plantName])
     
 def get_folders(userID):
-    folder_rows = db.query("SELECT * FROM folders WHERE userID = ?", [userID])
+    folder_rows = db.query("SELECT folderID, folderName FROM folders WHERE userID = ?", [userID])
     sql_count = "SELECT quantity FROM folder WHERE folderID = ?"
     folders = {}
     for folder in folder_rows:
@@ -354,14 +354,14 @@ def get_folders(userID):
     return folders
 
 def delete_folder(userID, name):
-    target_folder = db.query("SELECT * FROM folders WHERE userID = ? AND folderName = ?", [userID, name])
+    target_folder = db.query("SELECT folderID, folderName FROM folders WHERE userID = ? AND folderName = ?", [userID, name])
     for i in get_folder_plants(userID, name):
         unfolder(userID, name, i["plantName"], i["quantity"])
     sql = "DELETE FROM folders WHERE userID = ? AND folderName = ? AND folderID = ?"
     db.execute(sql, [userID, name, target_folder[0]["folderID"]])
 
 def rename_folder(userID, name, newName):
-    target_folder = db.query("SELECT * FROM folders WHERE userID = ? AND folderName = ?", [userID, name])
+    target_folder = db.query("SELECT folderID, folderName FROM folders WHERE userID = ? AND folderName = ?", [userID, name])
     rename = """UPDATE folders SET folderName = ? WHERE folderID = ? AND userID = ?"""
     db.execute(rename, [newName, target_folder[0]["folderID"], userID])
 

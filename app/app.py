@@ -135,8 +135,8 @@ def display_folder(name, page_num=1):
 @app.route("/forage", methods = ["GET", "POST"])
 def forage():
     users.require_login(request)
-    areas = db.query("SELECT * FROM areas")
-    regions = db.query("SELECT * FROM regions")
+    areas = db.query("SELECT areaName FROM areas")
+    regions = db.query("SELECT regionName FROM regions")
     if request.method == "GET":
        return render_template("forage.html", message="", areas=areas, regions=regions)
     if request.method == "POST":
@@ -164,11 +164,9 @@ def forage():
         if sum(weights) > 0:
             rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
             for r in rarityResults:
-                sql = "SELECT * FROM plants WHERE rarityID = ? ORDER BY RANDOM() LIMIT 1"
+                sql = "SELECT plantName FROM plants WHERE rarityID = ? ORDER BY RANDOM() LIMIT 1"
                 plant_found = db.query(sql, [r])
                 commands.add_to_inventory(plant_found[0], session["userID"])
-        areas = db.query("SELECT * FROM areas WHERE areaName = ?", [area])
-        regions = db.query("SELECT * FROM regions WHERE regionName = ?", [region])
         
         # Statistics
         db.execute("UPDATE statistics SET timesForaged = timesForaged + 1 WHERE userID = ?", [session["userID"]])
@@ -205,8 +203,8 @@ def import_plants():
 @app.route("/profile", methods = ["GET", "POST"])
 def profile():
     users.require_login(request)
-    statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
-    user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
+    statistics = db.query("SELECT timesForaged, highestRarity FROM statistics WHERE userID = ?", [session["userID"]])[0]
+    user = db.query("SELECT username, isAdmin, forageBonus, forageMultiplier FROM users WHERE userID = ?", [session["userID"]])[0]
     if request.method == "GET":
         return render_template("profile.html", message = "", user=user, statistics=statistics)
     if request.method == "POST":
