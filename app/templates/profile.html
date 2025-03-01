@@ -7,6 +7,7 @@
 
 <body>
   <form action="/profile" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <p>
       Username: <br />
       <input type="text" name="username" value="{{user.username }}" minlength="3" required/>

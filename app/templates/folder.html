@@ -6,6 +6,7 @@
 
     <body>
         <form action="/inventory/{{ name }}/{{ page }}" method = "POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <label for="filters">Search in:</label>
             <select name="filter" id="filters">
                 <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
@@ -24,9 +25,11 @@
             <button type="submit">Filter</button>
         </form>
         <form action="/deleteFolder/{{ name }}" method = "POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <button type="submit">Delete Folder</button>
         </form>
         <form action="/renameFolder/{{ name }}" method = "POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <input type="text" name="newName" minlength="1" required/>
             <button type="submit">Rename Folder</button>
         </form>
@@ -35,6 +38,7 @@
         <p>
             <a href="/plants/{{ plant.plantName }}?source={{ 'inventory/' ~ name }}">{{ plant.plantName }} - {{ plant.quantity }}</a>
             <form action="/unfolder/{{ name }}/{{ plant.plantName }}" method = "POST">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                 <button type="submit">Return to Inventory</button>
             </form>
         </p>

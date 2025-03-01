@@ -1,11 +1,16 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 import db
 from flask import session, abort, redirect, render_template
+import secrets
 import sqlite3
 
-def require_login():
+def require_login(request):
     if "userID" not in session:
-        return abort(403)
+        abort(403)
+    if request.method == "POST":
+        token = request.form.get("csrf_token")
+        if not token or token != session.get("csrf_token"):
+            abort(403)
 
 def require_admin():
     if not session["isAdmin"]:
@@ -31,6 +36,7 @@ def login(username, password):
             session["forageBonus"] = bonus[0][0]
             multiplier = db.query("SELECT forageMultiplier FROM users where username = ?", [session["username"]])
             session["forageMultiplier"] = multiplier[0][0]
+            session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
         
 def register_user(username, password1, password2, bonus, multiplier, isAdmin):
@@ -50,3 +56,4 @@ def register_user(username, password1, password2, bonus, multiplier, isAdmin):
     getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
     session["userID"] = getID[0][0]
     db.execute("INSERT INTO statistics (userID) VALUES (?)", [session["userID"]])
+    session["csrf_token"] = secrets.token_hex(16)

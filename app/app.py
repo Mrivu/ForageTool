@@ -49,7 +49,7 @@ def logout():
 
 @app.route("/catalogue/<int:page_num>", methods=["GET", "POST"])
 def catalogue(page_num=1):
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         session["keyword"] = request.form.get("keyword", "")
         session["selected_filter"] = request.form.get("filter", "Name")
@@ -70,7 +70,7 @@ def catalogue(page_num=1):
 
 @app.route("/inventory/<int:page_num>", methods = ["GET", "POST"])
 def inventory(page_num=1):
-    users.require_login()
+    users.require_login(request)
     folders = commands.get_folders(session["userID"])
     move_location = session.get("moveLocation")
     if move_location and move_location in commands.get_folders(session["userID"]):
@@ -91,7 +91,7 @@ def inventory(page_num=1):
     
 @app.route("/newFolder", methods = ["POST"])
 def newFolder():
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         folderName = request.form["newFolder"]
         print(session["userID"])
@@ -100,7 +100,7 @@ def newFolder():
 
 @app.route("/movePlant/<string:name>", methods = ["POST"])
 def move_plant(name):
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         folderName = request.form["folder"]
         session["moveLocation"] = folderName
@@ -109,7 +109,7 @@ def move_plant(name):
 
 @app.route("/unfolder/<string:folder>/<string:name>", methods = ["POST"])
 def unfolder(folder, name):
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         folderName = folder
         commands.unfolder(session["userID"], folderName, name)
@@ -117,7 +117,7 @@ def unfolder(folder, name):
 
 @app.route("/inventory/<string:name>/<int:page_num>", methods = ["GET", "POST"])
 def display_folder(name, page_num=1):
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         selected_filter = request.form["filter"]
         keyword = request.form["keyword"]
@@ -134,7 +134,7 @@ def display_folder(name, page_num=1):
 
 @app.route("/forage", methods = ["GET", "POST"])
 def forage():
-    users.require_login()
+    users.require_login(request)
     areas = db.query("SELECT * FROM areas")
     regions = db.query("SELECT * FROM regions")
     if request.method == "GET":
@@ -181,7 +181,7 @@ def forage():
 
 @app.route("/import", methods = ["GET", "POST"])
 def import_plants():
-    users.require_login()
+    users.require_login(request)
     users.require_admin()
     if request.method == "GET":
         return render_template("import.html")
@@ -204,7 +204,7 @@ def import_plants():
 
 @app.route("/profile", methods = ["GET", "POST"])
 def profile():
-    users.require_login()
+    users.require_login(request)
     statistics = db.query("SELECT * FROM statistics WHERE userID = ?", [session["userID"]])[0]
     user = db.query("SELECT * FROM users WHERE userID = ?", [session["userID"]])[0]
     if request.method == "GET":
@@ -237,7 +237,7 @@ def profile():
 
 @app.route("/plants/<string:name>")
 def view_plant(name):
-    users.require_login()
+    users.require_login(request)
     plant = commands.get_plant(name)
     source = request.args.get("source", "catalogue")
     page = request.args.get("page", 1)
@@ -245,7 +245,7 @@ def view_plant(name):
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
 def edit_plant(name):
-    users.require_login()
+    users.require_login(request)
     users.require_admin()
     if request.method == "GET":
         plant = commands.get_plant(name)
@@ -264,7 +264,7 @@ def edit_plant(name):
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
 def delete_plant(name):
-    users.require_login()
+    users.require_login(request)
     users.require_admin()
     if request.method == "GET":
         plant = commands.get_plant(name)
@@ -279,14 +279,14 @@ def delete_plant(name):
         
 @app.route("/deleteFolder/<string:name>", methods = ["POST"])
 def delete_folder(name):
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         commands.delete_folder(session["userID"], name)
         return redirect("/inventory/1")
     
 @app.route("/renameFolder/<string:name>", methods = ["POST"])
 def rename_folder(name):
-    users.require_login()
+    users.require_login(request)
     if request.method == "POST":
         newName = request.form["newName"]
         commands.rename_folder(session["userID"], name, newName)

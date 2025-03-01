@@ -8,6 +8,7 @@
         <h1>Import plants</h1>
         <h2>Load plant JSON file</h2>
         <form action="/import" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <input type="file" name="plants" accept=".json" required>
             <label>
                 <input type="checkbox" name="overwrite" value="yes"> Overwrite Existing
