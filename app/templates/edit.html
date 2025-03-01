@@ -9,6 +9,7 @@
         <form action="/edit/{{ plant.plantName }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <h1>{{ plant.plantName }}</h1>
+            <hr />
             <input type="text" name="Name" value="{{ plant.plantName }}" minlength="3" required>
             <h2>{{ plant.rarity }} plant</h2>
             <label for="Rarity">Rarity:</label>
