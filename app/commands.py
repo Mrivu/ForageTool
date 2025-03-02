@@ -271,7 +271,7 @@ def move_plant_to_folder(userID, folderName, plantName, change=1):
     if not folder_rows:
         raise ValueError(f"Folder '{folderName}' not found for user {userID}")
     folderID = folder_rows[0][0]
-    folder_contents = db.query("SELECT folderID, folderName FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])
+    folder_contents = db.query("SELECT quantity FROM folder WHERE plantName = ? AND folderID = ?", [plantName, folderID])
 
     if folder_contents:
         sql =  """
