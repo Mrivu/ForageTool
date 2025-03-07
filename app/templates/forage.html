@@ -17,6 +17,8 @@
     Multiplier: {{ session.forageMultiplier }}
     <label for="plantAvailability">Availability:</label>
     <input type="number" name="plantAvailability" value="0" min="-10" max="10" />
+    <label for="diceroll">Manual Diceroll:</label>
+    <input type="number" name="diceroll" value="0" min="0" max="20" />
     </p>
     <label for="areas">Area:</label>
         <select name="areas" id="areas">
@@ -31,9 +33,15 @@
         {% endfor %}
         </select>
     <button type="submit" name="button" value="Roll">Roll forage check</button>
-    <a href="/">Go back</a>
-    <h1>{{ message }}</h1>
   </form>
+  <a href="/">Go back</a>
+  <h1>Manual plant Addition</h1>
+  <form action="/forage" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="file" name="plants" accept=".json" required>
+    <button type="submit">Upload</button>
+  </form>
+  <h1>{{ message }}</h1>
 </body>
 
 </html>

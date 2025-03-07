@@ -107,6 +107,13 @@ def move_plant(name):
         commands.move_plant_to_folder(session["userID"], folderName, name)
     return redirect("/inventory/1")
 
+@app.route("/removeFromInventory/<string:name>", methods = ["POST"])
+def remove_from_inventory(name):
+    users.require_login(request)
+    if request.method == "POST":
+        commands.remove_from_inventory(session["userID"], name)
+    return redirect("/inventory/1")
+
 @app.route("/unfolder/<string:folder>/<string:name>", methods = ["POST"])
 def unfolder(folder, name):
     users.require_login(request)
@@ -138,35 +145,56 @@ def forage():
     areas = db.query("SELECT areaName FROM areas")
     regions = db.query("SELECT regionName FROM regions")
     if request.method == "GET":
-       return render_template("forage.html", message="", areas=areas, regions=regions)
+        return render_template("forage.html", message="", areas=areas, regions=regions)
     if request.method == "POST":
+        try:
+            file = request.files["plants"]
+        except:
+            file = None
+        if file:
+            if file and file.filename.endswith(".json"):
+                try:
+                    data = json.load(file)
+                    for plant in data:
+                        commands.add_to_inventory(plant, session["userID"], plant["count"])
+                    return render_template("forage.html", areas=areas, regions=regions, message = "Plants added to inventory")
+                except json.JSONDecodeError:
+                    return render_template("forage.html", areas=areas, regions=regions, message = "Unable to read JSON file, invalid formatting")
+            return render_template("forage.html", areas=areas, regions=regions, message = "Invalid file type. Please upload a JSON file.")
         if not commands.get_plants_by():
             return render_template("forage.html", message="No plants imported", areas=areas, regions=regions)
         extraBonus = int(request.form.get("extraBonus") or 0)
         availability = int(request.form.get("plantAvailability") or 0)
         area = request.form["areas"]
         region = request.form["regions"]
-        diceroll = random.randint(1,20)
+        manualDice = int(request.form["diceroll"])
+        diceroll = manualDice if manualDice is not 0 else random.randint(1,20)
         total = diceroll+session["forageBonus"]+extraBonus
         if (total > 40):
             total = 40
         elif (total < 1):
             total = 1
+        print(total)
         plantAmount = math.floor(total / 10)+availability
         if diceroll == 20: ## Check nat 20
             plantAmount += 1
+        print(plantAmount)
         plantAmount = (plantAmount) * int(session["forageMultiplier"])
+        print(plantAmount)
         weights = [rarity.rollResults[total-1]["Common"],
            rarity.rollResults[total-1]["Uncommon"],
            rarity.rollResults[total-1]["Rare"],
            rarity.rollResults[total-1]["Very Rare"],
            rarity.rollResults[total-1]["Legendary"]]
+        plants_found_text = ""
         if sum(weights) > 0:
+            plants_found_text += " You Found: "
             rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
+            print(rarityResults)
             for r in rarityResults:
-                sql = "SELECT plantName FROM plants WHERE rarityID = ? ORDER BY RANDOM() LIMIT 1"
-                plant_found = db.query(sql, [r])
+                plant_found = commands.forage_plant(r, area, region)
                 commands.add_to_inventory(plant_found[0], session["userID"])
+                plants_found_text += f"a {plant_found[0]["plantName"]}, "
         
         # Statistics
         db.execute("UPDATE statistics SET timesForaged = timesForaged + 1 WHERE userID = ?", [session["userID"]])
@@ -174,7 +202,7 @@ def forage():
         if plants:
             db.execute("UPDATE statistics SET highestRarity = ? WHERE userID = ?", [plants[-1]["rarity"], session["userID"]])
 
-        return render_template("forage.html", message=f"You rolled a {total}", areas=areas, regions=regions)
+        return render_template("forage.html", message=f"You rolled a {total}!"+plants_found_text, areas=areas, regions=regions)
         
 
 @app.route("/import", methods = ["GET", "POST"])

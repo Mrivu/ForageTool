@@ -200,13 +200,45 @@ def insert_plant(plant):
             value = repeats[0][0]+1
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], i, value])
 
-def add_to_inventory(plant, user_id):
+def add_to_inventory(plant, user_id, count=1):
     result = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [user_id, plant["plantName"]])
     if result:
-        quantity = result[0][0] + 1
+        quantity = result[0][0] + count
         db.execute("UPDATE inventory SET quantity = ? WHERE userID = ? AND plantName = ?", [quantity, user_id, plant["plantName"]])
     else:
-        db.execute("INSERT INTO inventory (userID, plantName, quantity) VALUES (?, ?, ?)", [user_id, plant["plantName"], 1])
+        db.execute("INSERT INTO inventory (userID, plantName, quantity) VALUES (?, ?, ?)", [user_id, plant["plantName"], count])
+
+def remove_from_inventory(userID, plantName, change=1):
+    plantQuantity = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [userID, plantName])
+    current_quantity = plantQuantity[0][0]
+    new_quantity = current_quantity - change
+    
+    if new_quantity > 0:
+        sql = """
+        UPDATE inventory 
+        SET quantity = ? 
+        WHERE userID = ? AND plantName = ?
+        """
+        db.execute(sql, [new_quantity, userID, plantName])
+    else:
+        sql = """
+        DELETE FROM inventory 
+        WHERE userID = ? AND plantName = ?
+        """
+        db.execute(sql, [userID, plantName])
+    
+
+def forage_plant(rarityID, area, region):
+    sql = """
+    SELECT p.plantName
+    FROM plants p
+    JOIN area a ON p.plantName = a.plantName
+    JOIN region r ON p.plantName = r.plantName
+    WHERE p.rarityID = ? AND a.areaName = ? AND r.regionName = ?
+    ORDER BY RANDOM() LIMIT 1
+    """
+    return db.query(sql, [rarityID, area, region])
+        
 
 def delete_plant(name):
     db.execute("DELETE FROM plants WHERE plantName = ?", [name])

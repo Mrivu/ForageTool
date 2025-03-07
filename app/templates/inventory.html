@@ -39,6 +39,10 @@
         {% for plant in inventory %}
         <p>
             <a href="/plants/{{ plant.plantName }}?source=inventory">{{ plant.plantName }} - {{ plant.quantity }}</a>
+            <form action="/removeFromInventory/{{ plant.plantName }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                <button type="submit">Remove plant</button>
+            </form>
             {% if folders %} 
             <form action="/movePlant/{{ plant.plantName }}" method = "POST">
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
