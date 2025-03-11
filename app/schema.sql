@@ -37,7 +37,7 @@ CREATE TABLE folder (
     quantity INTEGER DEFAULT 1,
     PRIMARY KEY (folderID, plantName),
     FOREIGN KEY (folderID) REFERENCES folders(folderID) ON DELETE CASCADE,
-    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE
+    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE plants (
