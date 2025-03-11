@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>{{ plant.plantName }}</title>
+        <title>Forage Tool</title>
+        <link rel="stylesheet" href="/static/plant.css">
     </head>
 
     <body>
+        <div class="plant">
+            {% if plant %}
+                <h1><span data-rarid="{{ plant.rarityID }}">{{ plant.plantName }}</span></h1>
+            {% endif %}
+        </div>
         {% if plant %}
-        <h1>{{ plant.plantName }}</h1>
-        <hr />
-        <h2>{{ plant.rarity }} plant</h2>
-        <h2>Found in {{ plant.plantAreas.replace(",", ", ") }} in {{ plant.plantRegions.replace(",", ", ") }}</h2>
-        <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
-        <h2>"{{ plant.plantDescription }}"</h2>
-        {% else %}
-        <p>Plant not found.</p>
+            <hr />
         {% endif %}
-        <a href="/{{ source }}/{{ page }}">Go back</a>
+        <div class="plant">
+            {% if plant %}
+                <h2><span data-rarid="{{ plant.rarityID }}">{{ plant.rarity }} plant</span></h2>
+                <h2>Found in: {{ plant.plantAreas.replace(",", ", ") }}</h2> 
+                <h2>In: {{ plant.plantRegions.replace(",", ", ") }}</h2>
+                <br>
+                <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
+                <h2><i>{{ plant.plantDescription }}"</i></h2>
+            {% else %}
+                <p>Plant not found.</p>
+            {% endif %}
+            <a href="/{{ source }}/{{ page }}">Go back</a>
+        </div>
     </body>
 </html>

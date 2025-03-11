@@ -1,56 +1,84 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>{{ name }}</title>
+        <title>Forage Tool</title>
+        <link rel="stylesheet" href="/static/folder.css">
     </head>
 
     <body>
-        <form action="/inventory/{{ name }}/{{ page }}" method = "POST">
+        <form action="/inventory/{{ name }}/{{ page }}" method = "POST" class="folder">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-            <label for="filters">Search in:</label>
-            <select name="filter" id="filters">
-                <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
-                <option value="Rarity" {% if selected_filter == "Rarity" %}selected{% endif %}>Rarity</option>
-                <option value="Area" {% if selected_filter == "Area" %}selected{% endif %}>Area</option>
-                <option value="Region" {% if selected_filter == "Region" %}selected{% endif %}>Region</option>
-                <option value="Effects" {% if selected_filter == "Effects" %}selected{% endif %}>Effects</option>
-                <option value="Description" {% if selected_filter == "Description" %}selected{% endif %}>Description</option>
-            </select>
-            Keyword:
-            {% if keyword %}
-            <input type="text" name="keyword" value="{{ keyword }}" />
-            {% else %}
-            <input type="text" name="keyword" />
-            {% endif %}
-            <button type="submit">Filter</button>
+            <parameter>
+                <a class="return" href="/">Go back</a>
+            </parameter>
+            <parameter>
+                <label for="filters">Sort in:</label>
+                    <select name="filter" id="filters">
+                        <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
+                        <option value="Rarity" {% if selected_filter == "Rarity" %}selected{% endif %}>Rarity</option>
+                        <option value="Area" {% if selected_filter == "Area" %}selected{% endif %}>Area</option>
+                        <option value="Region" {% if selected_filter == "Region" %}selected{% endif %}>Region</option>
+                        <option value="Effects" {% if selected_filter == "Effects" %}selected{% endif %}>Effects</option>
+                        <option value="Description" {% if selected_filter == "Description" %}selected{% endif %}>Description</option>
+                    </select>
+                </parameter>
+                <parameter>
+                    Hakusana:
+                    {% if keyword %}
+                    <input type="text" name="keyword" value="{{ keyword }}" />
+                    {% else %}
+                    <input type="text" name="keyword" />
+                    {% endif %}
+                </parameter>
+                <button type="submit">Filter</button>
         </form>
-        <form action="/deleteFolder/{{ name }}" method = "POST">
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-            <button type="submit">Delete Folder</button>
-        </form>
-        <form action="/renameFolder/{{ name }}" method = "POST">
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-            <input type="text" name="newName" minlength="1" required/>
-            <button type="submit">Rename Folder</button>
-        </form>
-        <a href="/inventory/1">Go back</a>
-        {% for plant in folder %}
-        <p>
-            <a href="/plants/{{ plant.plantName }}?source={{ 'inventory/' ~ name }}">{{ plant.plantName }} - {{ plant.quantity }}</a>
-            <form action="/unfolder/{{ name }}/{{ plant.plantName }}" method = "POST">
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-                <button type="submit">Return to Inventory</button>
-            </form>
-        </p>
-        {% endfor %}
-        <p>
-            {% if page > 1 %}
-                <a href="/{{ name }}/{{ page - 1 }}">&lt;&lt;</a>
-            {% endif %}
-            Page {{ page }}/{{ page_count }}
-            {% if page < page_count %}
-                <a href="/inventory/{{ name }}/{{ page + 1 }}">&gt;&gt;</a>
-            {% endif %}
-        </p>
+        <hr>
+        <div class="folder">
+            <div class="folder-options">
+                <form action="/deleteFolder/{{ name }}" method = "POST">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                    <button type="submit">Delete Folder</button>
+                </form>
+                <form action="/renameFolder/{{ name }}" method = "POST">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                    <input type="text" name="newName" minlength="1" required/>
+                    <button type="submit">Rename Folder</button>
+                </form>
+            </div>
+        </div>
+        <div class="plants">
+            {% for plant in folder %}
+            <div class="plant-row">
+                <div class="plant-inner">
+                    <a href="/plants/{{ plant.plantName }}?source={{ 'inventory/' ~ name }}" class="plant-link">
+                        <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }} - {{ plant.quantity }}</span>
+                        <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
+                    </a>
+                </div>
+                <div class="unfolder">
+                    <form action="/unfolder/{{ name }}/{{ plant.plantName }}" method = "POST">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                        <button type="submit">Return to Inventory</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="page">
+            <p>
+                {% if page > 1 %}
+                    <a href="/inventory/{{ name }}/{{ page + 1 }}">&lt;&lt;</a>
+                {% else %}
+                  <span style="visibility: hidden;">&lt;&lt;</span>
+                {% endif %}
+                Page {{ page }}/{{ page_count }}
+                {% if page < page_count %}
+                  <a href="/inventory/{{ name }}/{{ page + 1 }}">&gt;&gt;</a>
+                {% else %}
+                  <span style="visibility: hidden;">&gt;&gt;</span>
+                {% endif %}
+            </p>
+        </div>
+        <hr>
     </body>
 </html>

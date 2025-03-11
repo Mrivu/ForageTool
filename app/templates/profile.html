@@ -2,11 +2,12 @@
 <html>
 
 <head>
-  <title>Profile</title>
+  <title>Forage Tool</title>
+  <link rel="stylesheet" href="/static/profile.css">
 </head>
 
 <body>
-  <form action="/profile" method="POST">
+  <form action="/profile" method="POST" class="profile">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <p>
       Username: <br />
@@ -20,14 +21,20 @@
       Enter forage Multiplier <br />
       <input type="number" name="multiplier" value={{user.forageMultiplier}} min="1" max="10" required />
     </p>
-    <label>
-      <input type="checkbox" name="admin" value="yes" {% if session.isAdmin %}checked{% endif %}> Admin user?
-    </label>
+    <p>
+      <label class="">
+        <input type="checkbox" name="admin" value="yes" {% if session.isAdmin %}checked{% endif %}> Admin user?
+      </label>
+    </p>
     <input type="submit" value="Save and Exit"/>
-    <h1>Times Foraged: {{ statistics.timesForaged }}</h1>
-    <h1>Rarest plant found: {{ statistics.highestRarity }}</h1>
+    <milestones>
+      <h2>Times Foraged: {{ statistics.timesForaged }}</h2>
+      <h2>Rarest plant found: {{ statistics.highestRarity }}</h2>
+    </milestones>
     <a href="/">Go back</a>
-    <h1>{{ message }}</h1>
+    <message>
+      <h1 class="message">{{ message }}</h1>
+    </message>
   </form>
 </body>
 

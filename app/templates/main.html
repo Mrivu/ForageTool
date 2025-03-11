@@ -2,35 +2,34 @@
 <html>
 
 <head>
-  <title>Main page</title>
+  <title>Forage Tool</title>
+  <link rel="stylesheet" href="/static/main.css">
 </head>
 
 <body>
   {% if session.username %}
-  <h1>Logged in as {{ session.username }}</h1>
+  <h1 class="title">Logged in as {{ session.username }}</h1>
   <hr />
-  <form action="/catalogue/1">
-    <button type="submit">See plant catalogue</button>
-  </form>
-  <form action="/inventory/1">
-    <button type="submit">View Inventory</button>
-  </form>
-  <form action="/forage">
-    <button type="submit">Forage for plants</button>
-  </form>
-  <form action="/profile">
-    <button type="submit">Profile</button>
-  </form>
+  <nav class="navbar">
+    <a href="/catalogue/1">Catalogue</a>
+    <a href="/inventory/1">Inventory</a>
+    <a href="/forage">Forage</a>
+    <a href="/profile">Profile</a>
     {% if session.isAdmin %}
-    <form action="/import">
-        <button type="submit">Import Plants (Admin)</button>
-    </form>
+      <a href="/import">Import Plants (Admin)</a>
     {% endif %}
-  <p>
     <a href="/logout">Log out</a>
-  </p>
+  </nav>
+  <hr />
+  <news class="news">
+    <h1>FORAGE TOOL</h1>
+    <h2>Version: {{ news.Version }} - {{ news.Release }}</h2>
+    <h3>{{ news.Changes }}</h3>
+  </news>
   {% else %}
-  <form action="/" method="POST">
+  <h1 class="title">Forage tool</h1>
+  <hr />
+  <form action="/" class="login" method="POST">
     <p>
       Username: <br />
       <input type="text" name="username" required/>
@@ -40,11 +39,13 @@
       <input type="password" name="password" required/>
     </p>
     <input type="submit"/>
+    <register>
+      <a href="/register">Register new user</a>
+    </register>
+    <message>
+      <h1>{{ message }}</h1>
+    </message>
   </form>
-  <p>
-    <a href="/register">Register</a>
-  </p>
-  <h1>{{ message }}</h1>
   {% endif %}
 </body>
 

@@ -9,6 +9,7 @@ import random
 import math
 import rarity
 import users
+import news
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -18,12 +19,12 @@ def user():
     if request.method == "GET":
         session["keyword"] = ""
         session["selected_filter"] = "Name"
-        return render_template("main.html", message="")
+        return render_template("main.html", message="", news=news.news)
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         users.login(username, password)
-        return render_template("main.html", message="Incorrect username or password")
+        return render_template("main.html", message="Incorrect username or password", news=news.news)
 
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -186,15 +187,14 @@ def forage():
            rarity.rollResults[total-1]["Rare"],
            rarity.rollResults[total-1]["Very Rare"],
            rarity.rollResults[total-1]["Legendary"]]
-        plants_found_text = ""
+        plants_found = []
         if sum(weights) > 0:
-            plants_found_text += " You Found: "
             rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
             print(rarityResults)
             for r in rarityResults:
                 plant_found = commands.forage_plant(r, area, region)
                 commands.add_to_inventory(plant_found[0], session["userID"])
-                plants_found_text += f"a {plant_found[0]["plantName"]}, "
+                plants_found.append(plant_found[0])
         
         # Statistics
         db.execute("UPDATE statistics SET timesForaged = timesForaged + 1 WHERE userID = ?", [session["userID"]])
@@ -202,7 +202,7 @@ def forage():
         if plants:
             db.execute("UPDATE statistics SET highestRarity = ? WHERE userID = ?", [plants[-1]["rarity"], session["userID"]])
 
-        return render_template("forage.html", message=f"You rolled a {total}!"+plants_found_text, areas=areas, regions=regions)
+        return render_template("forage.html", message=f"You rolled a {total}!", plants_found=plants_found, areas=areas, regions=regions)
         
 
 @app.route("/import", methods = ["GET", "POST"])

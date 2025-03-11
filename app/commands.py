@@ -48,7 +48,9 @@ def get_inventory(user_id, keyword, filter, pageNum=None):
         p.plantDescription,
         GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
         GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
-        GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects,
+        (SELECT GROUP_CONCAT(effectName) 
+         FROM effect 
+         WHERE plantName = p.plantName) AS plantEffects,
         i.quantity
     FROM inventory i
     JOIN plants p ON i.plantName = p.plantName
@@ -95,7 +97,9 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
                 p.plantDescription,
                 GROUP_CONCAT(DISTINCT a.areaName)   AS plantAreas,
                 GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
-                GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects
+                (SELECT GROUP_CONCAT(effectName) 
+                 FROM effect 
+                 WHERE plantName = p.plantName) AS plantEffects
             FROM plants p
             JOIN rarity ra ON p.rarityID = ra.rarityID
             JOIN area pa ON p.plantName = pa.plantName
@@ -230,7 +234,7 @@ def remove_from_inventory(userID, plantName, change=1):
 
 def forage_plant(rarityID, area, region):
     sql = """
-    SELECT p.plantName
+    SELECT p.plantName, p.rarityID
     FROM plants p
     JOIN area a ON p.plantName = a.plantName
     JOIN region r ON p.plantName = r.plantName
@@ -262,7 +266,9 @@ def get_folder_plants(userID, folderName, keyword="", filter="Name", pageNum=Non
         p.plantDescription,
         GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
         GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
-        GROUP_CONCAT(DISTINCT e.effectName) AS plantEffects
+        (SELECT GROUP_CONCAT(effectName) 
+         FROM effect 
+         WHERE plantName = p.plantName) AS plantEffects
     FROM folder fp
     JOIN plants p ON fp.plantName = p.plantName
     JOIN rarity ra ON p.rarityID = ra.rarityID

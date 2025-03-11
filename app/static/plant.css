@@ -1,0 +1,45 @@
+.plant {
+    display: flex;              
+    flex-direction: column;     
+    align-items: center;        
+    margin: 0 auto;             
+    width: 50wh;               
+    font-family: Arial, sans-serif;
+}
+
+span[data-rarid="1"] {
+    color: rgb(90, 95, 90);
+  }
+span[data-rarid="2"] {
+    color: rgb(32, 112, 25);
+  }
+span[data-rarid="3"] {
+    color: rgb(61, 25, 190);
+  }
+span[data-rarid="4"] {
+    color: rgb(185, 16, 163);
+  }
+span[data-rarid="5"] {
+    color: rgb(202, 144, 18);
+  }
+
+.plant a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+
+.plant a:hover {
+    text-decoration: underline;
+  }
+
+.plant hr {
+    display: block;
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    unicode-bidi: isolate;
+    overflow: hidden;
+    border-style: inset;
+    border-width: 1px;
+}

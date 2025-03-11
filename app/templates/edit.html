@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>Edit {{ plant.Name }}</title>
+    <title>Forage Tool</title>
     </head>
 
     <body>
@@ -15,7 +15,7 @@
             <label for="Rarity">Rarity:</label>
             <select name="Rarity" id="Rarity">
                 {% for r in rarity %}
-                    <option value={{r}} {% if plant.rarity == r %}selected{% endif %}>{{ r }}</option>
+                    <option value="{{r}}" {% if plant.rarity == r %}selected{% endif %}>{{ r }}</option>
                 {% endfor %}
             </select>
             <h2>Found in {{ plant.plantAreas.replace(",", ", ") }} in {{ plant.plantRegions.replace(",", ", ") }}</h2>

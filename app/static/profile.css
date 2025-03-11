@@ -1,0 +1,57 @@
+.profile a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+  
+.profile a:hover {
+    text-decoration: underline;
+  }
+
+
+.profile input[type="number"],
+.profile input[type="text"] {
+    width: 50px;             
+    text-align: center;      
+    padding: 0.5em;
+    margin-top: 0.25em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+.profile {
+    display: flex;              
+    flex-direction: column;     
+    align-items: center;        
+    margin: 0 auto;             
+    width: 300px;               
+    font-family: Arial, sans-serif;
+}
+
+.profile p {
+    width: 100%;                
+    text-align: center;           
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;     
+    white-space: nowrap;
+}
+
+.profile p input[type="text"] {
+    width: 200px;       
+    padding: 0.5em;     
+    font-size: 1rem;    
+    box-sizing: border-box;  
+}
+
+.profile message {
+    width: 300%;
+    text-align: center;
+}
+
+.profile milestones {
+    width: 300%;
+    text-align: center;
+}

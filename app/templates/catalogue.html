@@ -1,53 +1,75 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>Plant Catalogue</title>
+        <title>Forage Tool</title>
+        <link rel="stylesheet" href="/static/catalogue.css">
     </head>
 
     <body>
-        <form action="/catalogue/{{ page }}" method = "POST">
-            <label for="filters">Sort by:</label>
-            <select name="filter" id="filters">
-                <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
-                <option value="Rarity" {% if selected_filter == "Rarity" %}selected{% endif %}>Rarity</option>
-                <option value="Area" {% if selected_filter == "Area" %}selected{% endif %}>Area</option>
-                <option value="Region" {% if selected_filter == "Region" %}selected{% endif %}>Region</option>
-                <option value="Effects" {% if selected_filter == "Effects" %}selected{% endif %}>Effects</option>
-                <option value="Description" {% if selected_filter == "Description" %}selected{% endif %}>Description</option>
-            </select>
-            Hakusana:
-            {% if keyword %}
-            <input type="text" name="keyword" value="{{ keyword }}" />
-            {% else %}
-            <input type="text" name="keyword" />
-            {% endif %}
+        <form action="/catalogue/{{ page }}" method = "POST" class="catalogue">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <parameter>
+                <a class="return" href="/">Go back</a>
+            </parameter>
+            <parameter>
+                <label for="filters">Sort in:</label>
+                <select name="filter" id="filters">
+                    <option value="Name" {% if selected_filter == "Name" %}selected{% endif %}>Name</option>
+                    <option value="Rarity" {% if selected_filter == "Rarity" %}selected{% endif %}>Rarity</option>
+                    <option value="Area" {% if selected_filter == "Area" %}selected{% endif %}>Area</option>
+                    <option value="Region" {% if selected_filter == "Region" %}selected{% endif %}>Region</option>
+                    <option value="Effects" {% if selected_filter == "Effects" %}selected{% endif %}>Effects</option>
+                    <option value="Description" {% if selected_filter == "Description" %}selected{% endif %}>Description</option>
+                </select>
+            </parameter>
+            <parameter>
+                Keyword:
+                {% if keyword %}
+                <input type="text" name="keyword" value="{{ keyword }}" />
+                {% else %}
+                <input type="text" name="keyword" />
+                {% endif %}
+            </parameter>
             <button type="submit">Filter</button>
         </form>
-        <a href="/">Go back</a>
-        {% for plant in plants %}
-        <p>
-            <a href="/plants/{{ plant.plantName }}?source=catalogue&page={{ page }}">{{ plant.plantName }}</a>
-            {% if session.isAdmin %}
-            <form action="/edit/{{ plant.plantName }}"">
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-                <button type="submit">Edit</button>
-            </form>
-            <form action="/delete/{{ plant.plantName }}">
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-                <button type="submit">Delete</button>
-            </form>
-            {% endif %}
-        </p>
-        {% endfor %}
-        <p>
-            {% if page > 1 %}
-                <a href="/catalogue/{{ page - 1 }}">&lt;&lt;</a>
-            {% endif %}
-            Page {{ page }}/{{ page_count }}
-            {% if page < page_count %}
-                <a href="/catalogue/{{ page + 1 }}">&gt;&gt;</a>
-            {% endif %}
-        </p>
+        <hr />
+        <div class="plants">
+            {% for plant in plants %}
+              <div class="plant-row">
+                <div class="plant-inner">
+                    <a href="/plants/{{ plant.plantName }}?source=catalogue&page={{ page }}" class="plant-link">
+                        <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }}</span>
+                        <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
+                    </a>
+                </div>
+                {% if session.isAdmin %}
+                  <form action="/edit/{{ plant.plantName }}">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                    <button type="submit">Edit</button>
+                  </form>
+                  <form action="/delete/{{ plant.plantName }}">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                    <button type="submit">Delete</button>
+                  </form>
+                {% endif %}
+              </div>
+            {% endfor %}
+        </div>
+        <div class="page">
+            <p>
+                {% if page > 1 %}
+                    <a href="/catalogue/{{ page - 1 }}">&lt;&lt;</a>
+                {% else %}
+                  <span style="visibility: hidden;">&lt;&lt;</span>
+                {% endif %}
+                Page {{ page }}/{{ page_count }}
+                {% if page < page_count %}
+                  <a href="/catalogue/{{ page + 1 }}">&gt;&gt;</a>
+                {% else %}
+                  <span style="visibility: hidden;">&gt;&gt;</span>
+                {% endif %}
+            </p>
+        </div>
         <hr />
     </body>
 </html>

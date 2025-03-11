@@ -1,0 +1,153 @@
+:root {
+    --font: "Arial", "sans-sherif";
+  }
+  
+.plant-inner a,
+.folder a,
+.page a {
+    text-decoration: none;
+  }
+
+.plant-link span[data-rarid="1"] {
+    color: rgb(90, 95, 90);
+    white-space: pre;
+    font-family: var(--font);
+  }
+.plant-link span[data-rarid="2"] {
+    color: rgb(32, 112, 25);
+    white-space: pre;
+    font-family: var(--font);
+  }
+.plant-link span[data-rarid="3"] {
+    color: rgb(61, 25, 190);
+    white-space: pre;
+    font-family: var(--font);
+  }
+.plant-link span[data-rarid="4"] {
+    color: rgb(185, 16, 163);
+    white-space: pre;
+    font-family: var(--font);
+  }
+.plant-link span[data-rarid="5"] {
+    color: rgb(202, 144, 18);
+    white-space: pre;
+    font-family: var(--font);
+  }
+
+.page a:hover,
+.folder a:hover,
+.plant-inner a:hover {
+    text-decoration: underline;
+  }
+
+.folder input[type="number"],
+.folder input[type="text"] {
+      width: 50px;             
+      text-align: center;      
+      padding: 0.5em;
+      margin-top: 0.25em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+  
+.folder {
+      display: flex;              
+      flex-direction: row;     
+      align-items: center;        
+      margin: 0 auto;             
+      width: 700px;               
+      font-family: Arial, sans-serif;
+  }
+  
+.folder p {
+    width: 100%;                
+    text-align: center;           
+    margin-bottom: 1rem;
+  }
+
+.folder .return {
+    font-size: 1.2em;    
+    margin-left: 1rem;   
+    text-decoration: none;
+    color: #007BFF;
+  }
+
+.folder parameter {
+  padding-right: 5rem;
+}
+
+.folder button[type="submit"] {
+  padding: 0.5em 1em;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.page p {
+  font-size: 1.2em;    
+  text-align: center;
+  margin-top: 1rem;  
+}
+
+.plants {
+  margin-top: 1rem;  
+  height: 65vh;    
+  overflow-y: auto;     
+  margin-left: 30vw;  
+}
+
+.plant-row {
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-wrap: nowrap;   
+  align-items: center;  
+}
+
+.plant-link {
+  display: flex;
+  width: 100%;             
+  justify-content: flex-start;   
+  align-items: center;     
+}
+
+.plant-inner {
+  display: flex;
+  justify-content: space-between;  
+  width: 40vw;         
+}
+
+.folder .folder-options input[type="text"] {
+    width: 100px;
+}
+
+.folder .folder-options {
+    margin-left: 5vw;
+    width: 20vw;
+    display: flex;
+    flex-direction: column;     
+    align-items: center; 
+}
+
+.unfolder {
+    margin-left: 1rem;
+}
+
+ 
+.plant-name {
+  width: 200px;            
+  text-align: left;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;     
+}
+
+.effects {
+  flex: 1;                 
+  text-align: right;
+  white-space: nowrap;     
+}

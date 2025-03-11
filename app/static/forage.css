@@ -1,0 +1,84 @@
+span[data-rarid="1"] {
+  color: rgb(90, 95, 90);
+}
+span[data-rarid="2"] {
+  color: rgb(32, 112, 25);
+}
+span[data-rarid="3"] {
+  color: rgb(61, 25, 190);
+}
+span[data-rarid="4"] {
+  color: rgb(185, 16, 163);
+}
+span[data-rarid="5"] {
+  color: rgb(202, 144, 18);
+}
+
+body {
+  margin: 0;
+}
+
+.forage {
+  display: flex;
+  justify-content: center;  
+  align-items: flex-start;  
+  max-width: 1200px;   
+  width: 80%;
+  margin: 0 auto;      
+  gap: 2rem;          
+  padding: 1rem;
+}
+
+.left-side {
+  width: 400px;
+  border-right: 1px solid #ccc;
+  text-align: center;
+}
+
+.right-side {
+  width: 400px;
+  box-sizing: border-box;
+  text-align: center;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.forage p {
+  width: 100%;                
+  text-align: center;           
+  margin-bottom: 1rem;
+}
+
+.forage input[type="number"] {
+  width: 50px;             
+  text-align: center;      
+  padding: 0.5em;
+  margin-top: 0.25em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  text-align: center;
+}
+  
+.roll {
+  padding: 0.5em 1em;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.forage a {
+  color: #007BFF;
+  text-decoration: none;
+}
+
+.forage a:hover {
+  text-decoration: underline;
+}
+
+.forage plantAdd {
+  width: 300%;
+  text-align: center;
+}

@@ -1,0 +1,90 @@
+   
+.register {
+    display: flex;              
+    flex-direction: column;     
+    align-items: center;        
+    margin: 0 auto;             
+    width: 300px;               
+    font-family: Arial, sans-serif;
+  }
+
+.title {
+    display: flex;
+    justify-content: center;  
+  }
+
+.register input[type="text"],
+.register input[type="password"],
+.register input[type="checkbox"] {
+    width: 100%;                
+    padding: 0.5em;
+    font-size: 1rem;
+    margin-top: 0.25em;         
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;     
+  }
+
+.register input[type="submit"] {
+    padding: 0.5em 1em;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+.register p {
+    width: 100%;                
+    text-align: center;           
+    margin-bottom: 1rem;
+  }
+
+ 
+.inline-fields {
+    display: flex;
+    justify-content: center;  
+    gap: 2rem;                
+    margin-bottom: 1rem;
+  }
+  
+   
+.field-group {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;     
+    white-space: nowrap;
+  }
+  
+   
+.field-group input[type="number"] {
+    width: 60px;             
+    text-align: center;      
+    padding: 0.5em;
+    margin-top: 0.25em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+.register message {
+    width: 300%;
+    text-align: center;
+}
+  
+.register return {
+    padding: 0.5em 1em;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+.register a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+  
+.register a:hover {
+    text-decoration: underline;
+  }
