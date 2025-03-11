@@ -11,13 +11,19 @@ filterReference = {
             "Effects": "e.effectName"
     }
 
-def get_plant(name):
+def get_plant(name, id=None):
+    if id != None:
+        name = db.query("SELECT plantName FROM plants WHERE plantID = ?", [id])[0]["plantName"]
     sql = """
     SELECT 
         p.plantName,
         ra.rarity,
         p.rarityID,
         p.plantDescription,
+        p.unobtainable,
+        p.isHidden,
+        p.isSecret,
+        p.plantID,
         GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
         GROUP_CONCAT(DISTINCT reg.regionName) AS plantRegions,
         (SELECT GROUP_CONCAT(effectName) 
@@ -46,6 +52,10 @@ def get_inventory(user_id, keyword, filter, pageNum=None):
         ra.rarity,
         p.rarityID,
         p.plantDescription,
+        p.unobtainable,
+        p.isHidden,
+        p.isSecret,
+        p.plantID,
         GROUP_CONCAT(DISTINCT a.areaName) AS plantAreas,
         GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
         (SELECT GROUP_CONCAT(effectName) 
@@ -95,6 +105,10 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
                 ra.rarity,
                 p.rarityID,
                 p.plantDescription,
+                p.unobtainable,
+                p.isHidden,
+                p.isSecret,
+                p.plantID,
                 GROUP_CONCAT(DISTINCT a.areaName)   AS plantAreas,
                 GROUP_CONCAT(DISTINCT r.regionName) AS plantRegions,
                 (SELECT GROUP_CONCAT(effectName) 
@@ -145,10 +159,16 @@ def get_rarity(plantName=None):
         rarityID = db.query("SELECT rarityID FROM plants WHERE plantName = ?", [plantName])
         return db.query("SELECT rarity FROM rarity WHERE rarityID = ?", [rarityID])
 
-def override_plant(plant, oldName):
+def new_plantID():
+    largestID = db.query("SELECT plantID FROM plants ORDER BY plantID DESC LIMIT 1")
+    if largestID:
+        return largestID[0][0]+1
+    return 1
+
+def override_plant(plant, oldName, attributes=[0,0,0]):
     plantUpdate = """
     UPDATE plants
-    SET plantName = ?, rarityID = ?, plantDescription = ?
+    SET plantName = ?, rarityID = ?, plantDescription = ?, unobtainable = ?, isHidden = ?, isSecret = ?
     WHERE plantName = ?
     """
 
@@ -159,7 +179,7 @@ def override_plant(plant, oldName):
     db.execute("DELETE FROM area WHERE plantName = ?", [oldName])
     db.execute("DELETE FROM region WHERE plantName = ?", [oldName])
     db.execute("DELETE FROM effect WHERE plantName = ?", [oldName])
-    db.execute(plantUpdate, [plant["name"], rarityID, plant["Description"], oldName]) 
+    db.execute(plantUpdate, [plant["name"], rarityID, plant["Description"], attributes[0], attributes[1], attributes[2], oldName]) 
 
     for a in plant["Area"]:
         db.execute("INSERT OR IGNORE INTO area (plantName, areaName) VALUES (?, ?)", [plant["name"], a])
@@ -175,13 +195,13 @@ def override_plant(plant, oldName):
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], e, value])
 
 def insert_plant(plant):
-    plantInsert = "INSERT INTO plants (plantName, rarityID, plantDescription) VALUES (?,?,?)"
+    plantInsert = "INSERT INTO plants (plantName, rarityID, plantDescription, plantID) VALUES (?,?,?,?)"
 
     rarityID = -1
     if plant["rarity"] in get_rarity():
         rarityID = db.query("SELECT rarityID FROM rarity WHERE rarity = ?", [plant["rarity"]])[0][0]
 
-    db.execute(plantInsert, [plant["name"], rarityID, plant["Description"]])
+    db.execute(plantInsert, [plant["name"], rarityID, plant["Description"], new_plantID()])
 
     for i in plant["Area"]:
         sql = "INSERT OR IGNORE INTO areas (areaName) VALUES (?)"
@@ -205,12 +225,16 @@ def insert_plant(plant):
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], i, value])
 
 def add_to_inventory(plant, user_id, count=1):
+    db.execute("INSERT OR IGNORE INTO found (plantName, userID) VALUES (?, ?)", [plant["plantName"], user_id])
     result = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [user_id, plant["plantName"]])
     if result:
         quantity = result[0][0] + count
         db.execute("UPDATE inventory SET quantity = ? WHERE userID = ? AND plantName = ?", [quantity, user_id, plant["plantName"]])
     else:
         db.execute("INSERT INTO inventory (userID, plantName, quantity) VALUES (?, ?, ?)", [user_id, plant["plantName"], count])
+
+def get_found(user_id):
+    return db.query("SELECT plantName FROM found WHERE userID = ?", [user_id])
 
 def remove_from_inventory(userID, plantName, change=1):
     plantQuantity = db.query("SELECT quantity FROM inventory WHERE userID = ? AND plantName = ?", [userID, plantName])
@@ -238,7 +262,7 @@ def forage_plant(rarityID, area, region):
     FROM plants p
     JOIN area a ON p.plantName = a.plantName
     JOIN region r ON p.plantName = r.plantName
-    WHERE p.rarityID = ? AND a.areaName = ? AND r.regionName = ?
+    WHERE p.rarityID = ? AND a.areaName = ? AND r.regionName = ? AND p.unobtainable = 0
     ORDER BY RANDOM() LIMIT 1
     """
     return db.query(sql, [rarityID, area, region])

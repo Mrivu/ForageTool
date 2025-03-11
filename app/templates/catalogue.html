@@ -25,9 +25,9 @@
             <parameter>
                 Keyword:
                 {% if keyword %}
-                <input type="text" name="keyword" value="{{ keyword }}" />
+                    <input type="text" name="keyword" value="{{ keyword }}" />
                 {% else %}
-                <input type="text" name="keyword" />
+                    <input type="text" name="keyword" />
                 {% endif %}
             </parameter>
             <button type="submit">Filter</button>
@@ -35,24 +35,30 @@
         <hr />
         <div class="plants">
             {% for plant in plants %}
-              <div class="plant-row">
-                <div class="plant-inner">
-                    <a href="/plants/{{ plant.plantName }}?source=catalogue&page={{ page }}" class="plant-link">
-                        <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }}</span>
-                        <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
-                    </a>
-                </div>
-                {% if session.isAdmin %}
-                  <form action="/edit/{{ plant.plantName }}">
-                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-                    <button type="submit">Edit</button>
-                  </form>
-                  <form action="/delete/{{ plant.plantName }}">
-                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-                    <button type="submit">Delete</button>
-                  </form>
+                {% if plant.isHidden == 0 or session.isAdmin == 1%}
+                    <div class="plant-row">
+                        <div class="plant-inner">
+                            <a href="/plants/{{ plant.plantID }}?source=catalogue&page={{ page }}" class="plant-link">
+                                {% if plant.isSecret == 0 or session.isAdmin == 1 or plant.plantName in found | map(attribute='plantName') | list %}
+                                <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }}</span>
+                                {% else %}
+                                <span data-rarid="{{ plant.rarityID }}" class="plant-name">?????</span>
+                                {% endif %}
+                                <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
+                            </a>
+                        </div>
+                        {% if session.isAdmin %}
+                        <form action="/edit/{{ plant.plantName }}">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                            <button type="submit">Edit</button>
+                        </form>
+                        <form action="/delete/{{ plant.plantName }}">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+                            <button type="submit">Delete</button>
+                        </form>
+                        {% endif %}
+                    </div>
                 {% endif %}
-              </div>
             {% endfor %}
         </div>
         <div class="page">

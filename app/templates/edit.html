@@ -25,6 +25,17 @@
             <input type="text" name="Effects" value="{{ plant.plantEffects }}" minlength="2" required>
             <h2>"{{ plant.plantDescription }}"</h2>
             <input type="text" name="Description" value="{{ plant.plantDescription }}" minlength="3" required>
+            <p>
+                <label>
+                <input type="checkbox" name="unobtainable" value="1" {% if plant.unobtainable == 1 %}checked{% endif %}> Is unobtainable?
+                </label>
+                <label>
+                <input type="checkbox" name="isHidden" value="1" {% if plant.isHidden == 1 %}checked{% endif %}> Is Hidden?
+                </label>
+                <label>
+                <input type="checkbox" name="isSecret" value="1" {% if plant.isSecret == 1 %}checked{% endif %}> Is Secret?
+                </label>
+            </p>
             <button type="submit" name="button" value="Save">Save changes</button>
         </form>
         {% else %}

@@ -41,9 +41,21 @@ CREATE TABLE folder (
 );
 
 CREATE TABLE plants (
+    plantID INTEGER,
     plantName TEXT PRIMARY KEY,
     plantDescription TEXT,
-    rarityID INTEGER
+    rarityID INTEGER,
+    unobtainable INTEGER DEFAULT 0, --Cannot be found while Foraging
+    isHidden INTEGER DEFAULT 0, --Not Shown in catalogue
+    isSecret INTEGER DEFAULT 0 --Name Replaced with ??? until found
+);
+
+CREATE TABLE found (
+    plantName TEXT,
+    userID INTEGER,
+    PRIMARY KEY (plantName, userID),
+    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
 CREATE TABLE rarity (

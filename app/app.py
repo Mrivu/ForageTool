@@ -20,6 +20,8 @@ def refresh_user_data():
         user_data = db.query("SELECT isAdmin FROM users WHERE userID = ?", [session["userID"]])
         if user_data:
             session["isAdmin"] = user_data[0]['isAdmin']
+        else:
+            logout()
 
 @app.route("/", methods = ["GET", "POST"])
 def user():
@@ -43,10 +45,8 @@ def register():
         password2 = request.form["password2"]
         bonus = int(request.form["bonus"])
         multiplier = int(request.form["multiplier"])
-        isAdmin = request.form.get("admin", "no")
-        print(password1, password2)
         
-        result = users.register_user(username, password1, password2, bonus, multiplier, isAdmin)
+        result = users.register_user(username, password1, password2, bonus, multiplier)
         if result is not None:
             return result
         return redirect("/")
@@ -73,8 +73,9 @@ def catalogue(page_num=1):
         return redirect("/catalogue/1")
     if page_num > page_count:
         return redirect("/catalogue/" + str(page_count))
-    
-    return render_template("catalogue.html", message="", page=page_num, page_count=page_count, plants=plants, keyword=keyword, selected_filter=selected_filter)
+
+    found = commands.get_found(session["userID"])
+    return render_template("catalogue.html", message="", found=found, page=page_num, page_count=page_count, plants=plants, keyword=keyword, selected_filter=selected_filter)
 
 @app.route("/inventory/<int:page_num>", methods = ["GET", "POST"])
 def inventory(page_num=1):
@@ -102,7 +103,6 @@ def newFolder():
     users.require_login(request)
     if request.method == "POST":
         folderName = request.form["newFolder"]
-        print(session["userID"])
         commands.new_folder(session["userID"], folderName)
     return redirect("/inventory/1")
 
@@ -182,13 +182,10 @@ def forage():
             total = 40
         elif (total < 1):
             total = 1
-        print(total)
         plantAmount = math.floor(total / 10)+availability
         if diceroll == 20: ## Check nat 20
             plantAmount += 1
-        print(plantAmount)
         plantAmount = (plantAmount) * int(session["forageMultiplier"])
-        print(plantAmount)
         weights = [rarity.rollResults[total-1]["Common"],
            rarity.rollResults[total-1]["Uncommon"],
            rarity.rollResults[total-1]["Rare"],
@@ -197,7 +194,6 @@ def forage():
         plants_found = []
         if sum(weights) > 0:
             rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
-            print(rarityResults)
             for r in rarityResults:
                 plant_found = commands.forage_plant(r, area, region)
                 commands.add_to_inventory(plant_found[0], session["userID"])
@@ -239,42 +235,40 @@ def import_plants():
 def profile():
     users.require_login(request)
     statistics = db.query("SELECT timesForaged, highestRarity FROM statistics WHERE userID = ?", [session["userID"]])[0]
-    user = db.query("SELECT username, isAdmin, forageBonus, forageMultiplier FROM users WHERE userID = ?", [session["userID"]])[0]
+    user = db.query("SELECT username, forageBonus, forageMultiplier FROM users WHERE userID = ?", [session["userID"]])[0]
     if request.method == "GET":
         return render_template("profile.html", message = "", user=user, statistics=statistics)
     if request.method == "POST":
         username = request.form["username"]
         bonus = int(request.form["bonus"])
         multiplier = int(request.form["multiplier"])
-        isAdmin = request.form.get("admin", "no")
-        isAdmin = 0 if isAdmin == "no" else 1
         if username == "":
             return render_template("profile.html", message = "The password and the username can't be empty", user=user, statistics=statistics)
         try:
             sql = """
                 UPDATE users 
-                SET username = ?, isAdmin = ?, forageBonus = ?, forageMultiplier = ?
+                SET username = ?, forageBonus = ?, forageMultiplier = ?
                 WHERE userID = ?
             """
-            db.execute(sql, [username, isAdmin, bonus, multiplier, session["userID"]])
+            db.execute(sql, [username, bonus, multiplier, session["userID"]])
         except sqlite3.IntegrityError:
             return render_template("profile.html", message=f"The username {username} is already taken", user=user, statistics=statistics)
 
         session["username"] = username
-        session["isAdmin"] = isAdmin
         session["forageBonus"] = bonus
         session["forageMultiplier"] = multiplier
         getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
         session["userID"] = getID[0][0]
         return redirect("/")
 
-@app.route("/plants/<string:name>")
-def view_plant(name):
+@app.route("/plants/<int:id>")
+def view_plant(id):
     users.require_login(request)
-    plant = commands.get_plant(name)
+    found = commands.get_found(session["userID"])
+    plant = commands.get_plant(None, id)
     source = request.args.get("source", "catalogue")
     page = request.args.get("page", 1)
-    return render_template("plant.html", page=page, plant=plant, source=source)
+    return render_template("plant.html", page=page, plant=plant, source=source, found=found)
 
 @app.route("/edit/<string:name>", methods = ["GET", "POST"])
 def edit_plant(name):
@@ -292,7 +286,10 @@ def edit_plant(name):
         plant["Region"] = request.form.get("Region").split(",")
         plant["Effects"] = request.form.get("Effects").split(",")
         plant["Description"] = request.form.get("Description")
-        commands.override_plant(plant, name)
+        unobtainable = int(request.form.get("unobtainable", 0))
+        isHidden = int(request.form.get("isHidden", 0))
+        isSecret = int(request.form.get("isSecret", 0))
+        commands.override_plant(plant, name, [unobtainable, isHidden, isSecret])
         return redirect(f"/catalogue/1")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])

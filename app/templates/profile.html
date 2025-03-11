@@ -21,11 +21,6 @@
       Enter forage Multiplier <br />
       <input type="number" name="multiplier" value={{user.forageMultiplier}} min="1" max="10" required />
     </p>
-    <p>
-      <label class="">
-        <input type="checkbox" name="admin" value="yes" {% if session.isAdmin %}checked{% endif %}> Admin user?
-      </label>
-    </p>
     <input type="submit" value="Save and Exit"/>
     <milestones>
       <h2>Times Foraged: {{ statistics.timesForaged }}</h2>

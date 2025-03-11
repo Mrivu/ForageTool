@@ -50,7 +50,7 @@
             {% for plant in folder %}
             <div class="plant-row">
                 <div class="plant-inner">
-                    <a href="/plants/{{ plant.plantName }}?source={{ 'inventory/' ~ name }}" class="plant-link">
+                    <a href="/plants/{{ plant.plantID }}?source={{ 'inventory/' ~ name }}" class="plant-link">
                         <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }} - {{ plant.quantity }}</span>
                         <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
                     </a>

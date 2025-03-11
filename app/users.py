@@ -39,18 +39,17 @@ def login(username, password):
             session["csrf_token"] = secrets.token_hex(16)
             return redirect("/")
         
-def register_user(username, password1, password2, bonus, multiplier, isAdmin):
-    isAdmin = 0 if isAdmin == "no" else 1
+def register_user(username, password1, password2, bonus, multiplier):
     if password1 != password2:
         return render_template("register.html", message = "The passwords don't match")
     password_hash = generate_password_hash(password1)
     try:
         sql = "INSERT INTO users (username, password_hash, isAdmin, forageBonus, forageMultiplier) VALUES (?, ?, ?, ?, ?)"
-        db.execute(sql, [username, password_hash, isAdmin, bonus, multiplier])
+        db.execute(sql, [username, password_hash, 0, bonus, multiplier])
     except sqlite3.IntegrityError:
         return render_template("register.html", message = f"The username {username} is aready taken")
     session["username"] = username
-    session["isAdmin"] = isAdmin
+    session["isAdmin"] = 0
     session["forageBonus"] = bonus
     session["forageMultiplier"] = multiplier
     getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])

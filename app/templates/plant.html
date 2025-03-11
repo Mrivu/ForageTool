@@ -8,7 +8,11 @@
     <body>
         <div class="plant">
             {% if plant %}
-                <h1><span data-rarid="{{ plant.rarityID }}">{{ plant.plantName }}</span></h1>
+                {% if plant.isSecret == 0 or session.isAdmin == 1 or plant.plantName in found | map(attribute='plantName') | list %}
+                    <h1><span data-rarid="{{ plant.rarityID }}">{{ plant.plantName }}</span></h1>
+                {% else %}
+                    <h1><span data-rarid="{{ plant.rarityID }}">?????</span></h1>
+                {% endif %}
             {% endif %}
         </div>
         {% if plant %}
@@ -20,10 +24,21 @@
                 <h2>Found in: {{ plant.plantAreas.replace(",", ", ") }}</h2> 
                 <h2>In: {{ plant.plantRegions.replace(",", ", ") }}</h2>
                 <br>
-                <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
-                <h2><i>{{ plant.plantDescription }}"</i></h2>
+                {% if plant.isSecret == 0 or session.isAdmin == 1 or plant.plantName in found | map(attribute='plantName') | list %}
+                    <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
+                    <h2><i>{{ plant.plantDescription }}"</i></h2>
+                {% else %}
+                    <h2>Effects: ?????</h2>
+                    <h2><i>?????</i></h2>
+                {% endif %}
+                <br>
+                {% if plant.plantName in found | map(attribute='plantName') | list %}
+                    <h3>Plant Discovered: Yes</h3>
+                {% else %}
+                    <h3>Plant Discovered: No</h3>
+                {% endif %}
             {% else %}
-                <p>Plant not found.</p>
+                <p>This plant does not exist.</p>
             {% endif %}
             <a href="/{{ source }}/{{ page }}">Go back</a>
         </div>
