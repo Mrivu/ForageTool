@@ -14,6 +14,13 @@ import news
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
+@app.before_request
+def refresh_user_data():
+    if "userID" in session:
+        user_data = db.query("SELECT isAdmin FROM users WHERE userID = ?", [session["userID"]])
+        if user_data:
+            session["isAdmin"] = user_data[0]['isAdmin']
+
 @app.route("/", methods = ["GET", "POST"])
 def user():
     if request.method == "GET":
@@ -169,7 +176,7 @@ def forage():
         area = request.form["areas"]
         region = request.form["regions"]
         manualDice = int(request.form["diceroll"])
-        diceroll = manualDice if manualDice is not 0 else random.randint(1,20)
+        diceroll = manualDice if manualDice != 0 else random.randint(1,20)
         total = diceroll+session["forageBonus"]+extraBonus
         if (total > 40):
             total = 40

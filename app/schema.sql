@@ -19,7 +19,7 @@ CREATE TABLE inventory (
     plantName TEXT,
     quantity INTEGER,
     PRIMARY KEY (userID, plantName),
-    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE,
+    FOREIGN KEY (plantName) REFERENCES plants(plantName) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
