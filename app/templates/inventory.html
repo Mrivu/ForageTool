@@ -6,10 +6,10 @@
     </head>
 
     <body>
-        <form action="/inventory/{{ page }}" method = "POST" class="inventory">
+        <form action="{{ config.app_route }}/inventory/{{ page }}" method = "POST" class="inventory">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <parameter>
-                <a class="return" href="/">Go back</a>
+                <a class="return" href="{{ config.app_route }}">Go back</a>
             </parameter>
             <parameter>
             <label for="filters">Sort in:</label>
@@ -33,7 +33,7 @@
             <button type="submit">Filter</button>
         </form>
         <hr />
-        <form action="/newFolder" method = "POST" class="inventory">
+        <form action="{{ config.app_route }}/newFolder" method = "POST" class="inventory">
             <div class="new-folder">
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                 <label for="newFolder">New Folder name: </label>
@@ -44,7 +44,7 @@
         <div class="inventory">
             {% for folderName, count in folders.items() %}
             <p>
-                <a href="/inventory/{{ folderName }}/1">{{ folderName }} - {{ count }}</a>
+                <a href="{{ config.app_route }}/inventory/{{ folderName }}/1">{{ folderName }} - {{ count }}</a>
             </p>
             {% endfor %}
         </div>
@@ -53,7 +53,7 @@
             <div class="plant-row">
                 <div class="move-plant">
                     {% if folders %} 
-                    <form action="/movePlant/{{ plant.plantName }}" method = "POST">
+                    <form action="{{ config.app_route }}/movePlant/{{ plant.plantName }}" method = "POST">
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                         <label for="folder">Folder: </label>
                         <select name="folder" id="folder">
@@ -66,13 +66,13 @@
                     {% endif %}
                 </div>
                 <div class="plant-inner">
-                    <a href="/plants/{{ plant.plantID }}?source=inventory" class="plant-link">
+                    <a href="{{ config.app_route }}/plants/{{ plant.plantID }}?source=inventory" class="plant-link">
                         <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }} - {{ plant.quantity }}</span>
                         <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
                     </a>
                 </div>
                 <div class="remove-plant">
-                    <form action="/removeFromInventory/{{ plant.plantName }}" method="POST">
+                    <form action="{{ config.app_route }}/removeFromInventory/{{ plant.plantName }}" method="POST">
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                         <button type="submit">Remove plant</button>
                     </form>
@@ -83,13 +83,13 @@
         <div class="page">
             <p>
                 {% if page > 1 %}
-                    <a href="/inventory/{{ page - 1 }}">&lt;&lt;</a>
+                    <a href="{{ config.app_route }}/inventory/{{ page - 1 }}">&lt;&lt;</a>
                 {% else %}
                   <span style="visibility: hidden;">&lt;&lt;</span>
                 {% endif %}
                 Page {{ page }}/{{ page_count }}
                 {% if page < page_count %}
-                  <a href="/inventory/{{ page + 1 }}">&gt;&gt;</a>
+                  <a href="{{ config.app_route }}/inventory/{{ page + 1 }}">&gt;&gt;</a>
                 {% else %}
                   <span style="visibility: hidden;">&gt;&gt;</span>
                 {% endif %}

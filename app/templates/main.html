@@ -11,14 +11,14 @@
   <h1 class="title">Logged in as {{ session.username }}</h1>
   <hr />
   <nav class="navbar">
-    <a href="/catalogue/1">Catalogue</a>
-    <a href="/inventory/1">Inventory</a>
-    <a href="/forage">Forage</a>
-    <a href="/profile">Profile</a>
+    <a href="{{ config.app_route }}/catalogue/1">Catalogue</a>
+    <a href="{{ config.app_route }}/inventory/1">Inventory</a>
+    <a href="{{ config.app_route }}/forage">Forage</a>
+    <a href="{{ config.app_route }}/profile">Profile</a>
     {% if session.isAdmin %}
-      <a href="/import">Import Plants (Admin)</a>
+      <a href="{{ config.app_route }}/import">Import Plants (Admin)</a>
     {% endif %}
-    <a href="/logout">Log out</a>
+    <a href="{{ config.app_route }}/logout">Log out</a>
   </nav>
   <hr />
   <news class="news">
@@ -29,7 +29,7 @@
   {% else %}
   <h1 class="title">Forage tool</h1>
   <hr />
-  <form action="/" class="login" method="POST">
+  <form action="{{ config.app_route }}" class="login" method="POST">
     <p>
       Username: <br />
       <input type="text" name="username" required/>
@@ -40,7 +40,7 @@
     </p>
     <input type="submit"/>
     <register>
-      <a href="/register">Register new user</a>
+      <a href="{{ config.app_route }}/register">Register new user</a>
     </register>
     <message>
       <h1>{{ message }}</h1>

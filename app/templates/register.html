@@ -9,7 +9,7 @@
 <body>
   <h1 class="title">Forage tool</h1>
   <hr />
-  <form action="/register" class="register" method="POST">
+  <form action="{{ config.app_route }}/register" class="register" method="POST">
     <p>
       Username: <br />
       <input type="text" name="username" minlength="3" required/>
@@ -37,7 +37,7 @@
     </div>
     <input type="submit" value="Create account" />
     <return>
-      <a href="/">Go back</a>
+      <a href="{{ config.app_route }}">Go back</a>
     </return>
     <message>
       <h1>{{ message }}</h1>

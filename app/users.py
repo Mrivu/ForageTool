@@ -3,6 +3,7 @@ import db
 from flask import session, abort, redirect, render_template
 import secrets
 import sqlite3
+import config
 
 def require_login(request):
     if "userID" not in session:
@@ -18,11 +19,12 @@ def require_admin():
 
 def logout():
     session.clear()
-    return redirect("/")
+    return redirect(config.app_route)
     
 def login(username, password):
     sql_password = "SELECT password_hash FROM users WHERE username = ?"
     password_hash = db.query(sql_password, [username])
+    print("b")
     if password_hash:
         password_hash = password_hash[0][0]
         if check_password_hash(password_hash, password):
@@ -37,17 +39,18 @@ def login(username, password):
             multiplier = db.query("SELECT forageMultiplier FROM users where username = ?", [session["username"]])
             session["forageMultiplier"] = multiplier[0][0]
             session["csrf_token"] = secrets.token_hex(16)
-            return redirect("/")
+            print("a")
+            print(config.app_route)
+            return redirect(config.app_route)
         
 def register_user(username, password1, password2, bonus, multiplier):
     if password1 != password2:
-        return render_template("register.html", message = "The passwords don't match")
+        return render_template("register.html", config=config, message = "The passwords don't match")
     password_hash = generate_password_hash(password1)
-    try:
-        sql = "INSERT INTO users (username, password_hash, isAdmin, forageBonus, forageMultiplier) VALUES (?, ?, ?, ?, ?)"
-        db.execute(sql, [username, password_hash, 0, bonus, multiplier])
-    except sqlite3.IntegrityError:
-        return render_template("register.html", message = f"The username {username} is aready taken")
+    if db.query("SELECT * FROM users WHERE username = ?", [username]):
+        return render_template("register.html", config=config, message = f"The username {username} is aready taken")
+    sql = "INSERT INTO users (username, password_hash, isAdmin, forageBonus, forageMultiplier) VALUES (?, ?, ?, ?, ?)"
+    db.execute(sql, [username, password_hash, 0, bonus, multiplier])
     session["username"] = username
     session["isAdmin"] = 0
     session["forageBonus"] = bonus

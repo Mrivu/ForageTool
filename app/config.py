@@ -1,1 +1,3 @@
-secret_key = "1f35f94edc80529333174876ace9fdf2"
+secret_key = None #secrets.token_hex(16)
+app_route = "/"
+page_size = 20

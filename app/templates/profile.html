@@ -7,7 +7,7 @@
 </head>
 
 <body>
-  <form action="/profile" method="POST" class="profile">
+  <form action="{{ config.app_route }}/profile" method="POST" class="profile">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <p>
       Username: <br />
@@ -26,7 +26,7 @@
       <h2>Times Foraged: {{ statistics.timesForaged }}</h2>
       <h2>Rarest plant found: {{ statistics.highestRarity }}</h2>
     </milestones>
-    <a href="/">Go back</a>
+    <a href="{{ config.app_route }}">Go back</a>
     <message>
       <h1 class="message">{{ message }}</h1>
     </message>

@@ -1,6 +1,5 @@
 import db
-import rarity
-import sqlite3
+import config
 
 filterReference = {
             "Name": "p.plantName",
@@ -85,8 +84,8 @@ def get_inventory(user_id, keyword, filter, pageNum=None):
     ORDER BY {filterReference[filter]}
     """
     if pageNum:
-        limit = 10
-        offset = 10 * (pageNum - 1)
+        limit = config.page_size
+        offset = config.page_size * (pageNum - 1)
         base_sql += "LIMIT ? OFFSET ?"
         arguments.append(limit)
         arguments.append(offset)
@@ -132,8 +131,8 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
             ORDER BY {orderClause}
         """
         if pageNum:
-            limit = 10
-            offset = 10 * (pageNum - 1)
+            limit = config.page_size
+            offset = config.page_size * (pageNum - 1)
             sql += "LIMIT ? OFFSET ?"
             arguments.append(limit)
             arguments.append(offset)
@@ -144,8 +143,8 @@ def get_plants_by(keyword="", filter="Name", pageNum=None):
             ORDER BY {orderClause}
         """
         if pageNum:
-            limit = 10
-            offset = 10 * (pageNum - 1)
+            limit = config.page_size
+            offset = config.page_size * (pageNum - 1)
             sql += "LIMIT ? OFFSET ?"
             arguments.append(limit)
             arguments.append(offset)
@@ -320,8 +319,8 @@ def get_folder_plants(userID, folderName, keyword="", filter="Name", pageNum=Non
     base_sql += f" ORDER BY {filterReference[filter]}"
     
     if pageNum:
-        limit = 10
-        offset = 10 * (pageNum - 1)
+        limit = config.page_size
+        offset = config.page_size * (pageNum - 1)
         base_sql += " LIMIT ? OFFSET ?"
         arguments.append(limit)
         arguments.append(offset)
