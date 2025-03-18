@@ -1,52 +1,55 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <title>Forage Tool</title>
-  <link rel="stylesheet" href="/static/main.css">
-</head>
+  <head>
+    <title>Forage Tool</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
-<body>
-  {% if session.username %}
-  <h1 class="title">Logged in as {{ session.username }}</h1>
-  <hr />
-  <nav class="navbar">
-    <a href="{{ config.app_route }}/catalogue/1">Catalogue</a>
-    <a href="{{ config.app_route }}/inventory/1">Inventory</a>
-    <a href="{{ config.app_route }}/forage">Forage</a>
-    <a href="{{ config.app_route }}/profile">Profile</a>
-    {% if session.isAdmin %}
-      <a href="{{ config.app_route }}/import">Import Plants (Admin)</a>
+
+
+    <link rel="stylesheet" href="/static/main.css">
+  </head>
+
+  <body>
+    {% if session.username %}
+    <h1 class="title">Logged in as {{ session.username }}</h1>
+    <hr />
+    <nav class="navbar">
+      <a href="{{ config.app_route }}/catalogue/1">Catalogue</a>
+      <a href="{{ config.app_route }}/inventory/1">Inventory</a>
+      <a href="{{ config.app_route }}/forage">Forage</a>
+      <a href="{{ config.app_route }}/profile">Profile</a>
+      {% if session.isAdmin %}
+        <a href="{{ config.app_route }}/import">Import Plants (Admin)</a>
+      {% endif %}
+      <a href="{{ config.app_route }}/logout">Log out</a>
+    </nav>
+    <hr />
+    <news class="news">
+      <h1>FORAGE TOOL</h1>
+      <h2>Version: {{ news.Version }} - {{ news.Release }}</h2>
+      <h3>{{ news.Changes }}</h3>
+    </news>
+    {% else %}
+    <h1 class="title">Forage tool</h1>
+    <hr />
+    <form action="{{ config.app_route }}" class="login" method="POST">
+      <p>
+        Username: <br />
+        <input type="text" name="username" required/>
+      </p>
+      <p>
+        Password: <br />
+        <input type="password" name="password" required/>
+      </p>
+      <input type="submit"/>
+      <register>
+        <a href="{{ config.app_route }}/register">Register new user</a>
+      </register>
+      <message>
+        <h1>{{ message }}</h1>
+      </message>
+    </form>
     {% endif %}
-    <a href="{{ config.app_route }}/logout">Log out</a>
-  </nav>
-  <hr />
-  <news class="news">
-    <h1>FORAGE TOOL</h1>
-    <h2>Version: {{ news.Version }} - {{ news.Release }}</h2>
-    <h3>{{ news.Changes }}</h3>
-  </news>
-  {% else %}
-  <h1 class="title">Forage tool</h1>
-  <hr />
-  <form action="{{ config.app_route }}" class="login" method="POST">
-    <p>
-      Username: <br />
-      <input type="text" name="username" required/>
-    </p>
-    <p>
-      Password: <br />
-      <input type="password" name="password" required/>
-    </p>
-    <input type="submit"/>
-    <register>
-      <a href="{{ config.app_route }}/register">Register new user</a>
-    </register>
-    <message>
-      <h1>{{ message }}</h1>
-    </message>
-  </form>
-  {% endif %}
-</body>
-
+  </body>
 </html>

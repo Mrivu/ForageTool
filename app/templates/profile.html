@@ -1,36 +1,39 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <title>Forage Tool</title>
-  <link rel="stylesheet" href="/static/profile.css">
-</head>
+  <head>
+    <title>Forage Tool</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
-<body>
-  <form action="{{ config.app_route }}/profile" method="POST" class="profile">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-    <p>
-      Username: <br />
-      <input type="text" name="username" value={{user.username }} minlength="3" required/>
-    </p>
-    <p>
-      Enter Survival modifier <br />
-      <input type="number" name="bonus" value={{user.forageBonus}} min="-20" max="40" required />
-    </p>
-    <p>
-      Enter forage Multiplier <br />
-      <input type="number" name="multiplier" value={{user.forageMultiplier}} min="1" max="10" required />
-    </p>
-    <input type="submit" value="Save and Exit"/>
-    <milestones>
-      <h2>Times Foraged: {{ statistics.timesForaged }}</h2>
-      <h2>Rarest plant found: {{ statistics.highestRarity }}</h2>
-    </milestones>
-    <a href="{{ config.app_route }}">Go back</a>
-    <message>
-      <h1 class="message">{{ message }}</h1>
-    </message>
-  </form>
-</body>
 
+
+    <link rel="stylesheet" href="/static/profile.css">
+  </head>
+
+  <body>
+    <form action="{{ config.app_route }}/profile" method="POST" class="profile">
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <p>
+        Username: <br />
+        <input type="text" name="username" value={{user.username }} minlength="3" required/>
+      </p>
+      <p>
+        Enter Survival modifier <br />
+        <input type="number" name="bonus" value={{user.forageBonus}} min="-20" max="40" required />
+      </p>
+      <p>
+        Enter forage Multiplier <br />
+        <input type="number" name="multiplier" value={{user.forageMultiplier}} min="1" max="10" required />
+      </p>
+      <input type="submit" value="Save and Exit"/>
+      <milestones>
+        <h2>Times Foraged: {{ statistics.timesForaged }}</h2>
+        <h2>Rarest plant found: {{ statistics.highestRarity }}</h2>
+      </milestones>
+      <a href="{{ config.app_route }}">Go back</a>
+      <message>
+        <h1 class="message">{{ message }}</h1>
+      </message>
+    </form>
+  </body>
 </html>
