@@ -6,6 +6,6 @@ Contact us at: 'ivugames@outlook.fi'"""
 
 news = {
     "Version": "1.0.0",
-    "Release": "xx.3.2025",
+    "Release": "18.3.2025",
     "Changes": changes
 }

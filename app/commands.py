@@ -44,6 +44,10 @@ def get_plant(name, id=None):
         return plant[0]
     return None
 
+def is_plant(name):
+    sql = """SELECT * FROM plants WHERE plantName = ?"""
+    return db.query(sql, [name])
+
 def get_inventory(user_id, keyword, filter, pageNum=None):
     base_sql = """
     SELECT 
@@ -194,7 +198,7 @@ def override_plant(plant, oldName, attributes=[0,0,0]):
         db.execute("INSERT OR IGNORE INTO effect (plantName, effectName, repeats) VALUES (?, ?, ?)", [plant["name"], e, value])
 
 def insert_plant(plant):
-    plantInsert = "INSERT INTO plants (plantName, rarityID, plantDescription, plantID) VALUES (?,?,?,?)"
+    plantInsert = "INSERT OR IGNORE INTO plants (plantName, rarityID, plantDescription, plantID) VALUES (?,?,?,?)"
 
     rarityID = -1
     if plant["rarity"] in get_rarity():

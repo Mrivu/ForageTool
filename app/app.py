@@ -156,8 +156,8 @@ def forage():
     if request.method == "GET":
         return render_template("forage.html", config=config, message="", areas=areas, regions=regions)
     if request.method == "POST":
-        session["areaFilter"] = request.form["areas"]
-        session["regionFilter"] = request.form["regions"]
+        session["areaFilter"] = request.form.get("areas", None)
+        session["regionFilter"] = request.form.get("regions", None)
         try:
             file = request.files["plants"]
         except:
@@ -229,8 +229,8 @@ def import_plants():
             try:
                 data = json.load(file)
                 for plant in data:
-                    existingPlant = commands.get_plant(plant["name"])
-                    if existingPlant and overwrite == "yes":
+                    existingPlant = commands.is_plant(plant["name"])
+                    if overwrite == "yes" and existingPlant:
                         commands.override_plant(plant, plant["name"])
                     elif not existingPlant:
                         commands.insert_plant(plant)
