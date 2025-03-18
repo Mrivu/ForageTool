@@ -156,6 +156,8 @@ def forage():
     if request.method == "GET":
         return render_template("forage.html", config=config, message="", areas=areas, regions=regions)
     if request.method == "POST":
+        session["areaFilter"] = request.form["areas"]
+        session["regionFilter"] = request.form["regions"]
         try:
             file = request.files["plants"]
         except:
@@ -201,8 +203,9 @@ def forage():
             rarityResults = random.choices([1,2,3,4,5], weights=weights, k=plantAmount)
             for r in rarityResults:
                 plant_found = commands.forage_plant(r, area, region)
-                commands.add_to_inventory(plant_found[0], session["userID"])
-                plants_found.append(plant_found[0])
+                if plant_found:
+                    commands.add_to_inventory(plant_found[0], session["userID"])
+                    plants_found.append(plant_found[0])
         
         # Statistics
         db.execute("UPDATE statistics SET timesForaged = timesForaged + 1 WHERE userID = ?", [session["userID"]])

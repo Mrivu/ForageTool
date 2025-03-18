@@ -43,3 +43,11 @@ span[data-rarid="5"] {
     border-style: inset;
     border-width: 1px;
 }
+
+.description {
+  font-family: 'Times New Roman';
+  max-width: 70%;  
+  text-align: center;  
+  word-wrap: break-word;
+  line-height: 1.5;
+}

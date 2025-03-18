@@ -26,7 +26,9 @@
                 <br>
                 {% if plant.isSecret == 0 or session.isAdmin == 1 or plant.plantName in found | map(attribute='plantName') | list %}
                     <h2>Effects: {{ plant.plantEffects.replace(",", ", ") }}</h2>
-                    <h2><i>{{ plant.plantDescription }}"</i></h2>
+                    <div class="description">
+                        <h2><i>"{{ plant.plantDescription }}"</i></h2>
+                    </div>
                 {% else %}
                     <h2>Effects: ?????</h2>
                     <h2><i>?????</i></h2>

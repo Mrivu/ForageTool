@@ -205,13 +205,13 @@ def insert_plant(plant):
     for i in plant["Area"]:
         sql = "INSERT OR IGNORE INTO areas (areaName) VALUES (?)"
         db.execute(sql, [i])
-        sql = "INSERT INTO area (plantName, areaName) VALUES (?, ?)"
+        sql = "INSERT OR IGNORE INTO area (plantName, areaName) VALUES (?, ?)"
         db.execute(sql, [plant["name"], i])
 
     for i in plant["Region"]:
         sql = "INSERT OR IGNORE INTO regions (regionName) VALUES (?)"
         db.execute(sql, [i])
-        sql = "INSERT INTO region (plantName, regionName) VALUES (?, ?)"
+        sql = "INSERT OR IGNORE INTO region (plantName, regionName) VALUES (?, ?)"
         db.execute(sql, [plant["name"], i])
 
     for i in plant["Effects"]:

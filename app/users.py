@@ -24,7 +24,6 @@ def logout():
 def login(username, password):
     sql_password = "SELECT password_hash FROM users WHERE username = ?"
     password_hash = db.query(sql_password, [username])
-    print("b")
     if password_hash:
         password_hash = password_hash[0][0]
         if check_password_hash(password_hash, password):
@@ -39,8 +38,6 @@ def login(username, password):
             multiplier = db.query("SELECT forageMultiplier FROM users where username = ?", [session["username"]])
             session["forageMultiplier"] = multiplier[0][0]
             session["csrf_token"] = secrets.token_hex(16)
-            print("a")
-            print(config.app_route)
             return redirect(config.app_route)
         
 def register_user(username, password1, password2, bonus, multiplier):

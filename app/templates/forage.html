@@ -29,13 +29,13 @@
         <label for="areas">Area:</label>
             <select name="areas" id="areas">
             {% for area in areas %}
-              <option value="{{ area.areaName }}">{{ area.areaName }}</option>
+              <option value="{{ area.areaName }}" {% if session.areaFilter == area.areaName %}selected{% endif %}>{{ area.areaName }}</option>
             {% endfor %}
             </select>
         <label for="regions">Region:</label>
             <select name="regions" id="regions">
             {% for region in regions %}
-              <option value="{{ region.regionName }}">{{ region.regionName }}</option>
+              <option value="{{ region.regionName }}" {% if session.regionFilter == region.regionName %}selected{% endif %}>{{ region.regionName }}</option>
             {% endfor %}
             </select>
         <p>
