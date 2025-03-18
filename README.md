@@ -1,20 +1,67 @@
 # ForageTool
-Submission for HY-TKT20019
-
 This application is an addition to my D&D campaign, which allows players to search, discover and manage plants.
 
-# Current state
-- Admin users can add plant packages, which update the available plants for all users.
-- Users are required to log in due to the existence of an admin account and database information.
-- Users can view and sort all acquired plants.
-- Users can view the catalogue, a list of all available plants.
-- Admins can edit plants, and add additional information to them.
-- Users can search for individual plants by name.
-- The application displays statistics on found plants.
-- Found plants can be sorted into different "Folders"
+## User Guide
+This section is for non-admin users, who use the website.
+- Feel free to contact us at "ivugames@outlook.fi" regarding any bugs or issues.
 
+## Forage and Alchemy ruleset
+The ruleset is being overhauled.
 
-# Current state
+### Plant logic
+Your roll determines the probabilites of plant rarity. See rarity.py for the exact levels.
+The amount of plants you find is calculated in the following way: 
+```
+(floor(Diceroll+Bonus+(extra 1 on crit)) + availability) * multiplier
+```
+
+## Setup
+This is a guide for a local setup for custom use. We are however, working on custom worlds for the website.
+- Clone the repository:
+```
+$ git clone https://github.com/Mrivu/ForageTool.git
+```
+- Create database: 
+```
+$ sqlite3 database.db < schema.sql
+```
+- Initialize database:
+```
+$ sqlite3 database.db < init.sql
+```
+- Setup ForageTool/app/config.py:
+Set an appropiate secret_key and enter the desired route for the forageTool.
+- Run application in ForageTool/app:
+```
+$ flask run
+```
+- When importing plants, a valid plant JSON can be found under the plant Packages folder at "ForageTool/PlantPackages/EvervastPlants2.json".
+
+## Help
+### "Invalid manual import file. See the github for help."
+The structure of the import file is invalid. Please see the example json file in "ForageTool/app/InventoryImport/Plants.json". This error is raised when the attributes "count" and/or "plantName" are not found at any given entry.
+
+### "Invalid plant in import. See the github for help."
+A plant you tried to import was Invalid. Please see the example json file in "ForageTool/PlantPackages/EvervastPlants2.json". This error is raised when one of the plant's attributes are not found at any given entry.
+
+## Plant flags
+### Unobtainable
+This plant is unobtainable via Forage rolls.
+### Hidden
+This plant is not found in the catalogue, unless the user has admin status.
+### Secret
+This plant's critical information is hidden until the user finds one.
+
+## Admin console
+The admin console is only accessible if you run the application locally using your own database. The documentation is placed within.
+- Run the console in ForageTool/app:
+```
+$ python3 adminconsole.py
+```
+
+# Submission for HY-TKT20019
+
+## Current state
 - Currently, the application supports a login and register system. Users are seperated into Admins and regular users.
 - Plant packages can be downloaded by admins via uploading a plant JSON. You can toggle if the download overrides any existing plants. 
 - These plants are exported to the catalogue, a listing of all available plants. These plants can be further edited or removed.
@@ -25,26 +72,11 @@ This application is an addition to my D&D campaign, which allows players to sear
 - The user can change user setting and see statistics form the profile panel.
 - Folders can be created and added to the inventory.
 
-# Guide
-- Create database: 
-```
-$ sqlite3 database.db < schema.sql
-```
-- Initialize database:
-```
-$ sqlite3 database.db < init.sql
-```
-- Run application in /app:
-```
-$ flask run
-```
-- When importing plants, a valid plant JSON can be found under the plant Packages folder at "/ForageTool/PlantPackages/EvervastPlants2.json".
-
-# Grading explanation
-## Sovelluksen perusvaatimukset (7 p)
+## Grading explanation
+### Sovelluksen perusvaatimukset (7 p)
  - Käyttäjä pystyy lisäämään, muokkaamaan ja poistamaan tietokohteita - Pätee vain admineille
  - Käyttäjä pystyy valitsemaan tietokohteelle yhden tai useamman luokittelun - Kasvit luokitellaan ominaisuuksien perusteella, joita voi muokata. Kasvin harvinaisuuden voi kuitenkin valita etukäteen asetetuista arvoista.
  - Käyttäjä pystyy lähettämään lisätietoa tietokohteeseen - Käyttäjän inventaarioon voidaan luoda kansioita
 
-## Sovelluksen turvallisuus (20 p)
+### Sovelluksen turvallisuus (20 p)
 Lomakkeissa on estetty CSRF-aukko	2 p	- Koodasin CSRF tarkistuksen, mutten onnistunut sen testauksessa

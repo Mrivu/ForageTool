@@ -3,9 +3,6 @@
     <head>
         <title>Forage Tool</title>
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-
-
-
     </head>
 
     <body>
@@ -31,7 +28,7 @@
             <input type="text" name="Description" value="{{ plant.plantDescription }}" minlength="3" required>
             <p>
                 <label>
-                <input type="checkbox" name="unobtainable" value="1" {% if plant.unobtainable == 1 %}checked{% endif %}> Is unobtainable?
+                <input type="checkbox" name="unobtainable" value="1" {% if plant.unobtainable == 1 %}checked{% endif %}> Is Unobtainable?
                 </label>
                 <label>
                 <input type="checkbox" name="isHidden" value="1" {% if plant.isHidden == 1 %}checked{% endif %}> Is Hidden?

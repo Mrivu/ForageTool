@@ -1,4 +1,3 @@
-
 rollResults = [
     {"Roll": 1, "Common": 0, "Uncommon": 0, "Rare": 0, "Very Rare": 0, "Legendary": 0},
     {"Roll": 2, "Common": 0, "Uncommon": 0, "Rare": 0, "Very Rare": 0, "Legendary": 0},
