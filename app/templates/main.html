@@ -12,14 +12,14 @@
     <h1 class="title">Logged in as {{ session.username }}</h1>
     <hr />
     <nav class="navbar">
-      <a href="/forageTool//catalogue/1">Catalogue</a>
-      <a href="/forageTool//inventory/1">Inventory</a>
-      <a href="/forageTool//forage">Forage</a>
-      <a href="/forageTool//profile">Profile</a>
+      <a href="/forageTool/catalogue/1">Catalogue</a>
+      <a href="/forageTool/inventory/1">Inventory</a>
+      <a href="/forageTool/forage">Forage</a>
+      <a href="/forageTool/profile">Profile</a>
       {% if session.isAdmin %}
-        <a href="/forageTool//import">Import Plants (Admin)</a>
+        <a href="/forageTool/import">Import Plants (Admin)</a>
       {% endif %}
-      <a href="/forageTool//logout">Log out</a>
+      <a href="/forageTool/logout">Log out</a>
     </nav>
     <hr />
     <news class="news">
@@ -41,7 +41,7 @@
       </p>
       <input type="submit"/>
       <register>
-        <a href="/forageTool//register">Register new user</a>
+        <a href="/forageTool/register">Register new user</a>
       </register>
       <message>
         <h1>{{ message }}</h1>

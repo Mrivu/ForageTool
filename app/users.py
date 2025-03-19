@@ -19,7 +19,7 @@ def require_admin():
 
 def logout():
     session.clear()
-    return redirect("/")
+    return redirect("/forageTool/")
     
 def login(username, password):
     sql_password = "SELECT password_hash FROM users WHERE username = ?"
@@ -38,7 +38,7 @@ def login(username, password):
             multiplier = db.query("SELECT forageMultiplier FROM users where username = ?", [session["username"]])
             session["forageMultiplier"] = multiplier[0][0]
             session["csrf_token"] = secrets.token_hex(16)
-            return redirect("/")
+            return redirect("/forageTool/")
         
 def register_user(username, password1, password2, bonus, multiplier):
     if password1 != password2:
