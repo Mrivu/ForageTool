@@ -11,8 +11,8 @@ import rarity
 import users
 import news
 
-app = Flask(__name__, static_url_path='/forageTool/static/')
-app.config['APPLICATION_ROOT'] = '/forageTOol'
+app = Flask(__name__, static_url_path='/forageTool/static', static_folder='static')
+app.config['APPLICATION_ROOT'] = '/forageTool'
 app.secret_key = config.secret_key
 
 @app.before_request
