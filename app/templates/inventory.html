@@ -45,7 +45,7 @@
         <div class="inventory">
             {% for folderName, count in folders.items() %}
             <p>
-                <a href="/inventory/{{ folderName }}/1">{{ folderName }} - {{ count }}</a>
+                <a href="/forageTool//inventory/{{ folderName }}/1">{{ folderName }} - {{ count }}</a>
             </p>
             {% endfor %}
         </div>
@@ -67,7 +67,7 @@
                     {% endif %}
                 </div>
                 <div class="plant-inner">
-                    <a href="/plants/{{ plant.plantID }}?source=inventory" class="plant-link">
+                    <a href="/forageTool//plants/{{ plant.plantID }}?source=inventory" class="plant-link">
                         <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }} - {{ plant.quantity }}</span>
                         <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
                     </a>
@@ -84,13 +84,13 @@
         <div class="page">
             <p>
                 {% if page > 1 %}
-                    <a href="/inventory/{{ page - 1 }}">&lt;&lt;</a>
+                    <a href="/forageTool//inventory/{{ page - 1 }}">&lt;&lt;</a>
                 {% else %}
                   <span style="visibility: hidden;">&lt;&lt;</span>
                 {% endif %}
                 Page {{ page }}/{{ page_count }}
                 {% if page < page_count %}
-                  <a href="/inventory/{{ page + 1 }}">&gt;&gt;</a>
+                  <a href="/forageTool//inventory/{{ page + 1 }}">&gt;&gt;</a>
                 {% else %}
                   <span style="visibility: hidden;">&gt;&gt;</span>
                 {% endif %}
