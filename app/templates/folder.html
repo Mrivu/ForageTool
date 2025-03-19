@@ -7,7 +7,7 @@
     </head>
 
     <body>
-        <form action="/inventory/{{ name }}/{{ page }}" method = "POST" class="folder">
+        <form action="/forageTool/inventory/{{ name }}/{{ page }}" method = "POST" class="folder">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <parameter>
                 <a href="/forageTool/inventory/1">Go back</a>
@@ -36,11 +36,11 @@
         <hr>
         <div class="folder">
             <div class="folder-options">
-                <form action="/deleteFolder/{{ name }}" method = "POST">
+                <form action="/forageTool/deleteFolder/{{ name }}" method = "POST">
                     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                     <button type="submit">Delete Folder</button>
                 </form>
-                <form action="/renameFolder/{{ name }}" method = "POST">
+                <form action="/forageTool/renameFolder/{{ name }}" method = "POST">
                     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                     <input type="text" name="newName" minlength="1" required/>
                     <button type="submit">Rename Folder</button>
@@ -57,7 +57,7 @@
                     </a>
                 </div>
                 <div class="unfolder">
-                    <form action="/unfolder/{{ name }}/{{ plant.plantName }}" method = "POST">
+                    <form action="/forageTool/unfolder/{{ name }}/{{ plant.plantName }}" method = "POST">
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                         <button type="submit">Return to Inventory</button>
                     </form>

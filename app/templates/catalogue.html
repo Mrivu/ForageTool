@@ -7,7 +7,7 @@
     </head>
 
     <body>
-        <form action="/catalogue/{{ page }}" method = "POST" class="catalogue">
+        <form action="/forageTool/catalogue/{{ page }}" method = "POST" class="catalogue">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <parameter>
                 <a class="return" href="/">Go back</a>
@@ -49,11 +49,11 @@
                             </a>
                         </div>
                         {% if session.isAdmin %}
-                        <form action="/edit/{{ plant.plantName }}">
+                        <form action="/forageTool/edit/{{ plant.plantName }}">
                             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                             <button type="submit">Edit</button>
                         </form>
-                        <form action="/delete/{{ plant.plantName }}">
+                        <form action="/forageTool/delete/{{ plant.plantName }}">
                             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                             <button type="submit">Delete</button>
                         </form>

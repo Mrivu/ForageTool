@@ -7,7 +7,7 @@
     </head>
 
     <body>
-        <form action="/inventory/{{ page }}" method = "POST" class="inventory">
+        <form action="/forageTool/inventory/{{ page }}" method = "POST" class="inventory">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <parameter>
                 <a class="return" href="/">Go back</a>
@@ -34,7 +34,7 @@
             <button type="submit">Filter</button>
         </form>
         <hr />
-        <form action="/newFolder" method = "POST" class="inventory">
+        <form action="/forageTool/newFolder" method = "POST" class="inventory">
             <div class="new-folder">
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                 <label for="newFolder">New Folder name: </label>
@@ -54,7 +54,7 @@
             <div class="plant-row">
                 <div class="move-plant">
                     {% if folders %} 
-                    <form action="/movePlant/{{ plant.plantName }}" method = "POST">
+                    <form action="/forageTool/movePlant/{{ plant.plantName }}" method = "POST">
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                         <label for="folder">Folder: </label>
                         <select name="folder" id="folder">
@@ -73,7 +73,7 @@
                     </a>
                 </div>
                 <div class="remove-plant">
-                    <form action="/removeFromInventory/{{ plant.plantName }}" method="POST">
+                    <form action="/forageTool/removeFromInventory/{{ plant.plantName }}" method="POST">
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                         <button type="submit">Remove plant</button>
                     </form>
