@@ -45,7 +45,11 @@
                                 {% else %}
                                 <span data-rarid="{{ plant.rarityID }}" class="plant-name">?????</span>
                                 {% endif %}
+                                {% if plant.isSecret == 0 or session.isAdmin == 1 or plant.plantName in found | map(attribute='plantName') | list %}
                                 <span data-rarid="{{ plant.rarityID }}" class="effects">{{ plant.plantEffects.replace(",", ", ") }}</span>
+                                {% else %}
+                                <span data-rarid="{{ plant.rarityID }}" class="effects">?????</span>
+                                {% endif %}
                             </a>
                         </div>
                         {% if session.isAdmin %}
