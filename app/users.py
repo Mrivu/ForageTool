@@ -19,7 +19,7 @@ def require_admin():
 
 def logout():
     session.clear()
-    return redirect(config.app_route)
+    return redirect("/")
     
 def login(username, password):
     sql_password = "SELECT password_hash FROM users WHERE username = ?"
@@ -38,14 +38,14 @@ def login(username, password):
             multiplier = db.query("SELECT forageMultiplier FROM users where username = ?", [session["username"]])
             session["forageMultiplier"] = multiplier[0][0]
             session["csrf_token"] = secrets.token_hex(16)
-            return redirect(config.app_route)
+            return redirect("/")
         
 def register_user(username, password1, password2, bonus, multiplier):
     if password1 != password2:
-        return render_template("register.html", config=config, message = "The passwords don't match")
+        return render_template("register.html", message = "The passwords don't match")
     password_hash = generate_password_hash(password1)
     if db.query("SELECT * FROM users WHERE username = ?", [username]):
-        return render_template("register.html", config=config, message = f"The username {username} is aready taken")
+        return render_template("register.html", message = f"The username {username} is aready taken")
     sql = "INSERT INTO users (username, password_hash, isAdmin, forageBonus, forageMultiplier) VALUES (?, ?, ?, ?, ?)"
     db.execute(sql, [username, password_hash, 0, bonus, multiplier])
     session["username"] = username

@@ -11,7 +11,7 @@
     <div class="forage">
       <div class="left-side">
         <h1>Forage</h1>
-        <form action="{{ config.app_route }}/forage" method="POST">
+        <form action="/forage" method="POST">
           <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
           <p>
             Bonus: {{ session.forageBonus }} - 
@@ -43,10 +43,10 @@
             <button class="roll" type="submit" name="button" value="Roll">Roll forage check</button>
           </p>
         </form>
-        <a href="{{ config.app_route }}">Go back</a>
+        <a href="/">Go back</a>
         <plantAdd>
           <h1>Manual plant Addition</h1>
-          <form action="{{ config.app_route }}/forage" method="POST" enctype="multipart/form-data">
+          <form action="/forage" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <input type="file" name="plants" accept=".json" required>
             <button type="submit">Upload</button>

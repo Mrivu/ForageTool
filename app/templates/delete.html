@@ -7,11 +7,11 @@
 
     <body>
         <h1>Are you sure you want to delete {{ plant.plantName }} from the Catalogue?</h1>
-        <form action="{{ config.app_route }}/delete/{{ plant.plantName }}" method="POST">
+        <form action="/delete/{{ plant.plantName }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <button type="submit" name="button" value="yes">YES</button>
             <button type="submit" name="button" value="no">NO</button>
         </form>
-        <a href="{{ config.app_route }}/catalogue/1">Go back</a>
+        <a href="/catalogue/1">Go back</a>
     </body>
 </html>

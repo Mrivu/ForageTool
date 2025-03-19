@@ -7,10 +7,10 @@
     </head>
 
     <body>
-        <form action="{{ config.app_route }}/catalogue/{{ page }}" method = "POST" class="catalogue">
+        <form action="/catalogue/{{ page }}" method = "POST" class="catalogue">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <parameter>
-                <a class="return" href="{{ config.app_route }}">Go back</a>
+                <a class="return" href="/">Go back</a>
             </parameter>
             <parameter>
                 <label for="filters">Sort in:</label>
@@ -39,7 +39,7 @@
                 {% if plant.isHidden == 0 or session.isAdmin == 1%}
                     <div class="plant-row">
                         <div class="plant-inner">
-                            <a href="{{ config.app_route }}/plants/{{ plant.plantID }}?source=catalogue&page={{ page }}" class="plant-link">
+                            <a href="/plants/{{ plant.plantID }}?source=catalogue&page={{ page }}" class="plant-link">
                                 {% if plant.isSecret == 0 or session.isAdmin == 1 or plant.plantName in found | map(attribute='plantName') | list %}
                                 <span data-rarid="{{ plant.rarityID }}" class="plant-name">{{ plant.plantName }}</span>
                                 {% else %}
@@ -49,11 +49,11 @@
                             </a>
                         </div>
                         {% if session.isAdmin %}
-                        <form action="{{ config.app_route }}/edit/{{ plant.plantName }}">
+                        <form action="/edit/{{ plant.plantName }}">
                             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                             <button type="submit">Edit</button>
                         </form>
-                        <form action="{{ config.app_route }}/delete/{{ plant.plantName }}">
+                        <form action="/delete/{{ plant.plantName }}">
                             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                             <button type="submit">Delete</button>
                         </form>
@@ -65,13 +65,13 @@
         <div class="page">
             <p>
                 {% if page > 1 %}
-                    <a href="{{ config.app_route }}/catalogue/{{ page - 1 }}">&lt;&lt;</a>
+                    <a href="/catalogue/{{ page - 1 }}">&lt;&lt;</a>
                 {% else %}
                   <span style="visibility: hidden;">&lt;&lt;</span>
                 {% endif %}
                 Page {{ page }}/{{ page_count }}
                 {% if page < page_count %}
-                  <a href="{{ config.app_route }}/catalogue/{{ page + 1 }}">&gt;&gt;</a>
+                  <a href="/catalogue/{{ page + 1 }}">&gt;&gt;</a>
                 {% else %}
                   <span style="visibility: hidden;">&gt;&gt;</span>
                 {% endif %}
