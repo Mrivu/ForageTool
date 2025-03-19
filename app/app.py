@@ -71,9 +71,9 @@ def catalogue(page_num=1):
     plants = commands.get_plants_by(keyword, selected_filter, page_num)
 
     if page_num < 1:
-        return redirect("/catalogue/1")
+        return redirect("/forageTool/catalogue/1")
     if page_num > page_count:
-        return redirect("/catalogue/" + str(page_count))
+        return redirect("/forageTool/catalogue/" + str(page_count))
 
     found = commands.get_found(session["userID"])
     return render_template("catalogue.html", message="", found=found, page=page_num, page_count=page_count, plants=plants, keyword=keyword, selected_filter=selected_filter)
@@ -94,9 +94,9 @@ def inventory(page_num=1):
     page_count = max(math.ceil(len(inventory) / config.page_size), 1)
     inventory = commands.get_inventory(session["userID"], session["keyword"], session["selected_filter"], page_num)
     if page_num < 1:
-        return redirect("/inventoy/1")
+        return redirect("/forageTool/inventoy/1")
     if page_num > page_count:
-        return redirect("/inventory/" + str(page_count))
+        return redirect("/forageTool/inventory/" + str(page_count))
     return render_template("inventory.html", page=page_num, page_count=page_count, move_location=move_location, message = "", inventory=inventory, keyword=session["keyword"], selected_filter=session["selected_filter"], folders=folders)
     
 @app.route("/newFolder", methods = ["POST"])
@@ -105,7 +105,7 @@ def newFolder():
     if request.method == "POST":
         folderName = request.form["newFolder"]
         commands.new_folder(session["userID"], folderName)
-    return redirect("/inventory/1")
+    return redirect("/forageTool/inventory/1")
 
 @app.route("/movePlant/<string:name>", methods = ["POST"])
 def move_plant(name):
@@ -114,14 +114,14 @@ def move_plant(name):
         folderName = request.form["folder"]
         session["moveLocation"] = folderName
         commands.move_plant_to_folder(session["userID"], folderName, name)
-    return redirect("/inventory/1")
+    return redirect("/forageTool/inventory/1")
 
 @app.route("/removeFromInventory/<string:name>", methods = ["POST"])
 def remove_from_inventory(name):
     users.require_login(request)
     if request.method == "POST":
         commands.remove_from_inventory(session["userID"], name)
-    return redirect("/inventory/1")
+    return redirect("/forageTool/inventory/1")
 
 @app.route("/unfolder/<string:folder>/<string:name>", methods = ["POST"])
 def unfolder(folder, name):
@@ -129,7 +129,7 @@ def unfolder(folder, name):
     if request.method == "POST":
         folderName = folder
         commands.unfolder(session["userID"], folderName, name)
-    return redirect("/inventory/"+folderName+"/1")
+    return redirect("/forageTool/inventory/"+folderName+"/1")
 
 @app.route("/inventory/<string:name>/<int:page_num>", methods = ["GET", "POST"])
 def display_folder(name, page_num=1):
@@ -143,9 +143,9 @@ def display_folder(name, page_num=1):
     page_count = max(math.ceil(len(folder) / config.page_size), 1)
     folder = commands.get_folder_plants(session["userID"], name, session["keyword"], session["selected_filter"], page_num)
     if page_num < 1:
-        return redirect("/inventoy/" + name)
+        return redirect("/forageTool/inventoy/" + name)
     if page_num > page_count:
-        return redirect("/inventory/" + name + "/" + str(page_count))
+        return redirect("/forageTool/inventory/" + name + "/" + str(page_count))
     return render_template("folder.html", message = "", page=page_num, page_count=page_count, name=name, folder=folder, keyword=session["keyword"], selected_filter=session["selected_filter"])
 
 @app.route("/forage", methods = ["GET", "POST"])
@@ -267,7 +267,7 @@ def profile():
         session["forageMultiplier"] = multiplier
         getID = db.query("SELECT userID FROM users where username = ?", [session["username"]])
         session["userID"] = getID[0][0]
-        return redirect("/")
+        return redirect("/forageTool/")
 
 @app.route("/plants/<int:id>")
 def view_plant(id):
@@ -298,7 +298,7 @@ def edit_plant(name):
         isHidden = int(request.form.get("isHidden", 0))
         isSecret = int(request.form.get("isSecret", 0))
         commands.override_plant(plant, name, [unobtainable, isHidden, isSecret])
-        return redirect("/catalogue/1")
+        return redirect("/forageTool/catalogue/1")
 
 @app.route("/delete/<string:name>", methods = ["GET", "POST"])
 def delete_plant(name):
@@ -311,16 +311,16 @@ def delete_plant(name):
         action = request.form.get("button")
         if action == "yes":
             commands.delete_plant(name)
-            return redirect("/catalogue/1")
+            return redirect("/forageTool/catalogue/1")
         elif action == "no":
-            return redirect("/catalogue/1")
+            return redirect("/forageTool/catalogue/1")
         
 @app.route("/deleteFolder/<string:name>", methods = ["POST"])
 def delete_folder(name):
     users.require_login(request)
     if request.method == "POST":
         commands.delete_folder(session["userID"], name)
-        return redirect("/inventory/1")
+        return redirect("/forageTool/inventory/1")
     
 @app.route("/renameFolder/<string:name>", methods = ["POST"])
 def rename_folder(name):
@@ -328,4 +328,4 @@ def rename_folder(name):
     if request.method == "POST":
         newName = request.form["newName"]
         commands.rename_folder(session["userID"], name, newName)
-        return redirect("/inventory/1")
+        return redirect("/forageTool/inventory/1")
