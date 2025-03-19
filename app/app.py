@@ -50,7 +50,7 @@ def register():
         result = users.register_user(username, password1, password2, bonus, multiplier)
         if result is not None:
             return result
-        return redirect("/")
+        return redirect("/forageTool/")
     
 @app.route("/logout")
 def logout():
