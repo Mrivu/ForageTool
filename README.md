@@ -51,7 +51,7 @@ This plant is unobtainable via Forage rolls.
 ### Hidden
 This plant is not found in the catalogue, unless the user has admin status.
 ### Secret
-This plant's critical information is hidden until the user finds one.
+This plants critical information is hidden until the user finds one.
 
 ## Admin console
 The admin console is only accessible if you run the application locally using your own database. The documentation is placed within.
