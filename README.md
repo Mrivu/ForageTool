@@ -13,7 +13,7 @@ The ruleset is being overhauled.
 Your roll determines the probabilities of plant rarity. See rarity.py for the exact levels.
 The amount of plants you find is calculated in the following way:
 ```
-(floor(Diceroll+Bonus+(extra 1 on crit)) + availability) * multiplier
+((floor(Diceroll/10)+Bonus+(extra 1 on crit)) + availability) * multiplier
 ```
 
 ## Setup
