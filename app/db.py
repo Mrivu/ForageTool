@@ -1,4 +1,5 @@
 import sqlite3
+import os
 from flask import g
 
 def get_connection():
@@ -22,3 +23,11 @@ def query(sql, params=[]):
     result = con.execute(sql, params).fetchall()
     con.close()
     return result
+
+def db_backup(name):
+    destination = "databaseBackup"
+    os.makedirs(destination, exist_ok=True)
+    backup = os.path.join(destination, f"Backup-{name}.db")
+    con = get_connection()
+    con.backup(sqlite3.connect(backup))
+    con.close()

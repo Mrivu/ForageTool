@@ -7,8 +7,10 @@ console_commands = {
     "ta": 1,
     "remove-user": 2,
     "ru": 2,
-    "backup-darabase": 3,
-    "bd": 3
+    "backup-database": 3,
+    "bd": 3,
+    "list-users": 4,
+    "lu": 4
 }
 
 parameters = {
@@ -16,9 +18,17 @@ parameters = {
     "ta": "username",
     "remove-user": "username",
     "ru": "username",
-    "backup-darabase": "date/filename",
-    "bd": "date/filename"
+    "backup-database": "date/filename",
+    "bd": "date/filename",
+    "list-users": "amount",
+    "lu": "amount"
 }
+
+def list_users(action):
+    users = db.query("SELECT username, userID, isAdmin FROM users LIMIT ?", [action[1]])
+    print("Found users:")
+    for i in users:
+        print(" -" + i["username"])
 
 def toggle_admin(action):
     user = db.query("SELECT userID, isAdmin FROM users WHERE username = ?", [action[1]])
@@ -76,6 +86,8 @@ with app.app_context():
                     remove_user(action)
                 case 3:
                     backup_database(action)
+                case 4:
+                    list_users(action)
         else:
             print("Invalid console command. Remember to add parameters. Valid commands: ")
             for i in console_commands:
