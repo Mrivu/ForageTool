@@ -1,5 +1,6 @@
 # ForageTool
 This application is an addition to my D&D campaign, which allows players to search, discover and manage plants.
+Use the tool at https://ivugames.fi/forageTool/
 
 ## User Guide
 This section is for non-admin users, who use the website.
